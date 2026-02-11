@@ -8,6 +8,7 @@ class TypingPractice {
         this.startTime = null;
         this.timerInterval = null;
         this.isStarted = false;
+        this.userInput = '';
         
         // Settings
         this.settings = {
@@ -46,20 +47,41 @@ class TypingPractice {
         const content = this.article.content;
         
         textDisplay.innerHTML = content.split('').map((char, index) => {
-            return `<span class="char" data-index="${index}">${char}</span>`;
+            return `<span class="char" data-index="${index}">${char === ' ' ? '&nbsp;' : char}</span>`;
         }).join('');
     }
 
     setupEventListeners() {
+        const typingArea = document.getElementById('typingArea');
         const input = document.getElementById('typingInput');
         
-        input.addEventListener('input', (e) => {
-            if (!this.isStarted) {
-                this.startPractice();
-            }
-            this.handleInput(e.target.value);
+        // Click anywhere in typing area to focus hidden input
+        typingArea.addEventListener('click', () => {
+            input.focus();
         });
 
+        // Handle keyboard input
+        document.addEventListener('keydown', (e) => {
+            // Ignore if settings dropdown is open
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            if (settingsDropdown.classList.contains('active')) {
+                return;
+            }
+
+            // Prevent default for typing keys
+            if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                input.focus();
+
+                if (!this.isStarted && e.key.length === 1) {
+                    this.startPractice();
+                }
+
+                this.handleKeyPress(e.key);
+            }
+        });
+
+        // Prevent paste
         input.addEventListener('paste', (e) => {
             e.preventDefault();
         });
@@ -68,7 +90,8 @@ class TypingPractice {
         const settingsToggle = document.getElementById('settingsToggle');
         const settingsDropdown = document.getElementById('settingsDropdown');
         
-        settingsToggle.addEventListener('click', () => {
+        settingsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             settingsDropdown.classList.toggle('active');
         });
 
@@ -82,7 +105,8 @@ class TypingPractice {
         // Background color buttons
         const colorBtns = document.querySelectorAll('.color-btn');
         colorBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const color = btn.dataset.color;
                 this.updateBackgroundColor(color);
                 colorBtns.forEach(b => b.classList.remove('active'));
@@ -111,12 +135,78 @@ class TypingPractice {
 
         // Reset button
         const resetBtn = document.getElementById('resetBtn');
-        resetBtn.addEventListener('click', () => {
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.resetPractice();
         });
 
         // Focus input on load
         input.focus();
+    }
+
+    handleKeyPress(key) {
+        const targetText = this.article.content;
+
+        if (key === 'Backspace') {
+            if (this.userInput.length > 0) {
+                this.userInput = this.userInput.slice(0, -1);
+                this.currentIndex = this.userInput.length;
+            }
+        } else if (key.length === 1) {
+            if (this.currentIndex < targetText.length) {
+                this.userInput += key;
+                this.currentIndex = this.userInput.length;
+            }
+        }
+
+        this.updateDisplay();
+        this.updateStats();
+
+        // Check if completed
+        if (this.userInput.length >= targetText.length && 
+            this.userInput === targetText) {
+            this.completePractice();
+        }
+    }
+
+    updateDisplay() {
+        const chars = document.querySelectorAll('.char');
+        const targetText = this.article.content;
+        const typingHint = document.getElementById('typingHint');
+
+        // Hide hint after first character
+        if (this.userInput.length > 0) {
+            typingHint.classList.add('hidden');
+        } else {
+            typingHint.classList.remove('hidden');
+        }
+
+        // Reset all chars
+        chars.forEach(char => {
+            char.classList.remove('typed-correct', 'typed-incorrect', 'current');
+        });
+
+        // Count errors
+        let errorsCount = 0;
+
+        // Mark typed characters
+        for (let i = 0; i < this.userInput.length; i++) {
+            if (i < targetText.length) {
+                if (this.userInput[i] === targetText[i]) {
+                    chars[i].classList.add('typed-correct');
+                } else {
+                    chars[i].classList.add('typed-incorrect');
+                    errorsCount++;
+                }
+            }
+        }
+
+        // Mark current character
+        if (this.currentIndex < targetText.length) {
+            chars[this.currentIndex].classList.add('current');
+        }
+
+        this.errors = errorsCount;
     }
 
     startPractice() {
@@ -127,46 +217,9 @@ class TypingPractice {
         }, 100);
     }
 
-    handleInput(value) {
-        const chars = document.querySelectorAll('.char');
-        const targetText = this.article.content;
-        
-        // Reset all chars
-        chars.forEach(char => {
-            char.classList.remove('correct', 'incorrect', 'current');
-        });
-
-        // Mark characters
-        let errorsCount = 0;
-        for (let i = 0; i < value.length; i++) {
-            if (i < targetText.length) {
-                if (value[i] === targetText[i]) {
-                    chars[i].classList.add('correct');
-                } else {
-                    chars[i].classList.add('incorrect');
-                    errorsCount++;
-                }
-            }
-        }
-
-        // Mark current character
-        if (value.length < targetText.length) {
-            chars[value.length].classList.add('current');
-        }
-
-        this.currentIndex = value.length;
-        this.errors = errorsCount;
-
-        // Update stats
-        this.updateStats();
-
-        // Check if completed
-        if (value.length >= targetText.length && value === targetText) {
-            this.completePractice();
-        }
-    }
-
     updateStats() {
+        if (!this.isStarted) return;
+
         // Calculate WPM (Words Per Minute)
         const timeElapsed = (Date.now() - this.startTime) / 1000 / 60; // minutes
         const wordsTyped = this.currentIndex / 5; // Standard: 5 chars = 1 word
@@ -194,12 +247,18 @@ class TypingPractice {
 
     completePractice() {
         clearInterval(this.timerInterval);
-        const input = document.getElementById('typingInput');
-        input.disabled = true;
+        
+        const wpm = document.getElementById('wpmValue').textContent;
+        const accuracy = document.getElementById('accuracyValue').textContent;
+        const time = document.getElementById('timeValue').textContent;
         
         // Show completion message
         setTimeout(() => {
-            alert(`🎉 Practice Complete!\n\nWPM: ${document.getElementById('wpmValue').textContent}\nAccuracy: ${document.getElementById('accuracyValue').textContent}\nTime: ${document.getElementById('timeValue').textContent}`);
+            const message = `🎉 练习完成！\n\n速度：${wpm} WPM\n准确率：${accuracy}\n用时：${time}`;
+            
+            if (confirm(message + '\n\n要再试一次吗？')) {
+                this.resetPractice();
+            }
         }, 500);
     }
 
@@ -214,21 +273,20 @@ class TypingPractice {
         this.errors = 0;
         this.startTime = null;
         this.isStarted = false;
-
-        // Reset UI
-        const input = document.getElementById('typingInput');
-        input.value = '';
-        input.disabled = false;
-        input.focus();
+        this.userInput = '';
 
         // Reset display
         this.renderTextDisplay();
+        document.getElementById('typingHint').classList.remove('hidden');
 
         // Reset stats
         document.getElementById('wpmValue').textContent = '0';
         document.getElementById('accuracyValue').textContent = '100%';
         document.getElementById('timeValue').textContent = '0:00';
         document.getElementById('progressValue').textContent = '0%';
+
+        // Focus input
+        document.getElementById('typingInput').focus();
     }
 
     applySettings() {
@@ -254,11 +312,11 @@ class TypingPractice {
         document.getElementById('typingArea').style.backgroundColor = color;
 
         // Update text color for dark backgrounds
-        const textDisplay = document.getElementById('textDisplay');
+        const chars = document.querySelectorAll('.char:not(.typed-correct):not(.typed-incorrect)');
         if (color === '#1f2937') {
-            textDisplay.style.color = '#d1d5db';
+            chars.forEach(char => char.style.color = '#9ca3af');
         } else {
-            textDisplay.style.color = '#6b7280';
+            chars.forEach(char => char.style.color = '#d1d5db');
         }
     }
 

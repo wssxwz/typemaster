@@ -97,20 +97,16 @@
 
         <!-- Typing Area -->
         <div class="typing-area" id="typingArea">
-            <div class="text-display" id="textDisplay">
-                <span class="hint-text">Start typing to begin</span>
-            </div>
-            <div class="input-area">
-                <input 
-                    type="text" 
-                    class="typing-input" 
-                    id="typingInput"
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                >
-            </div>
+            <div class="typing-hint" id="typingHint">Start typing to begin</div>
+            <div class="text-display" id="textDisplay"></div>
+            <textarea 
+                class="typing-input-hidden" 
+                id="typingInput"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            ></textarea>
         </div>
 
         <!-- Settings Panel -->
