@@ -47,7 +47,8 @@ class TypingPractice {
         const content = this.article.content;
         
         textDisplay.innerHTML = content.split('').map((char, index) => {
-            return `<span class="char" data-index="${index}">${char === ' ' ? '&nbsp;' : char}</span>`;
+            const className = index === 0 ? 'char current' : 'char';
+            return `<span class="${className}" data-index="${index}">${char === ' ' ? '&nbsp;' : char}</span>`;
         }).join('');
     }
 

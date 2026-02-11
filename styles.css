@@ -435,21 +435,30 @@ body {
 }
 
 .char.current {
-    background: rgba(59, 130, 246, 0.25);
-    animation: pulse 1.5s ease-in-out infinite;
+    position: relative;
+    background: rgba(59, 130, 246, 0.2);
     border-radius: 2px;
     padding: 0 2px;
     margin: 0 -2px;
 }
 
-@keyframes pulse {
-    0%, 100% { 
-        background: rgba(59, 130, 246, 0.25);
-        transform: scale(1);
+.char.current::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 10%;
+    bottom: 10%;
+    width: 2px;
+    background: var(--accent-blue);
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 49% { 
+        opacity: 1;
     }
-    50% { 
-        background: rgba(59, 130, 246, 0.4);
-        transform: scale(1.05);
+    50%, 100% { 
+        opacity: 0;
     }
 }
 
