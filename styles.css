@@ -767,32 +767,35 @@ body {
     /* Stats Panel Mobile */
     .stats-panel {
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
     
     .stat-card {
-        padding: 1rem;
-        flex-direction: column;
-        text-align: center;
+        padding: 0.75rem;
+        flex-direction: row;
+        text-align: left;
+        gap: 0.5rem;
     }
     
     .stat-icon {
-        width: 36px;
-        height: 36px;
-        margin-bottom: 0.5rem;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 0;
     }
     
     .stat-icon svg {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
     }
     
     .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+        margin-bottom: 0.125rem;
     }
     
     .stat-value {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+        line-height: 1;
     }
     
     /* Typing Area Mobile */
@@ -906,11 +909,26 @@ body {
     }
     
     .stat-card {
-        padding: 0.75rem;
+        padding: 0.5rem;
+        min-height: auto;
+    }
+    
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .stat-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
     }
     
     .stat-value {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
     }
     
     .typing-area {
