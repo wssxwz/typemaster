@@ -252,17 +252,119 @@ class TypingPractice {
         const accuracy = document.getElementById('accuracyValue').textContent;
         const time = document.getElementById('timeValue').textContent;
         
-        // Show completion message
+        // Show completion modal
         setTimeout(() => {
-            const message = `🎉 练习完成！\n\n速度：${wpm} WPM\n准确率：${accuracy}\n用时：${time}`;
-            
-            if (confirm(message + '\n\n要再试一次吗？')) {
-                this.resetPractice();
+            this.showCompletionModal(wpm, accuracy, time);
+        }, 300);
+    }
+
+    showCompletionModal(wpm, accuracy, time) {
+        // Update modal stats
+        document.getElementById('finalWpm').textContent = wpm;
+        document.getElementById('finalAccuracy').textContent = accuracy;
+        document.getElementById('finalTime').textContent = time;
+
+        // Show overlay
+        const overlay = document.getElementById('completionOverlay');
+        overlay.classList.add('active');
+
+        // Start fireworks
+        this.startFireworks();
+
+        // Stop fireworks after 5 seconds
+        setTimeout(() => {
+            this.stopFireworks();
+        }, 5000);
+    }
+
+    startFireworks() {
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.radius = Math.random() * 3 + 1;
             }
-        }, 500);
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.y += 0.1; // gravity
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= this.decay;
+                this.draw();
+            }
+        }
+
+        const createFirework = () => {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height * 0.5) + canvas.height * 0.1;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        };
+
+        const animate = () => {
+            this.fireworksAnimationId = requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha <= 0) {
+                    particles.splice(index, 1);
+                } else {
+                    particle.update();
+                }
+            });
+        };
+
+        // Create fireworks every 500ms
+        this.fireworksInterval = setInterval(createFirework, 500);
+        animate();
+    }
+
+    stopFireworks() {
+        if (this.fireworksInterval) {
+            clearInterval(this.fireworksInterval);
+        }
+        if (this.fireworksAnimationId) {
+            cancelAnimationFrame(this.fireworksAnimationId);
+        }
     }
 
     resetPractice() {
+        // Hide completion modal
+        const overlay = document.getElementById('completionOverlay');
+        overlay.classList.remove('active');
+        this.stopFireworks();
+
         // Clear timer
         if (this.timerInterval) {
             clearInterval(this.timerInterval);

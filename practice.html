@@ -109,6 +109,41 @@
             ></textarea>
         </div>
 
+        <!-- Completion Modal -->
+        <div class="completion-overlay" id="completionOverlay">
+            <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
+            <div class="completion-card">
+                <div class="completion-icon">🎉</div>
+                <h2 class="completion-title">练习完成！</h2>
+                <div class="completion-stats">
+                    <div class="completion-stat">
+                        <div class="stat-number" id="finalWpm">0</div>
+                        <div class="stat-label">WPM</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="stat-number" id="finalAccuracy">100%</div>
+                        <div class="stat-label">准确率</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="stat-number" id="finalTime">0:00</div>
+                        <div class="stat-label">用时</div>
+                    </div>
+                </div>
+                <div class="completion-actions">
+                    <button class="btn-secondary" onclick="practice.resetPractice()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 3v5h5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        再试一次
+                    </button>
+                    <button class="btn-primary" onclick="window.location.href='index.html'">
+                        返回首页
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Panel -->
         <div class="settings-panel">
             <button class="settings-toggle" id="settingsToggle">
