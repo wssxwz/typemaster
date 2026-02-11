@@ -305,15 +305,18 @@ body {
 .back-button {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     color: var(--text-secondary);
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
 }
 
 .back-button:hover {
     color: var(--primary-color);
+    background: var(--bg-gray);
 }
 
 /* Stats Panel */
