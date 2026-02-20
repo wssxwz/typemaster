@@ -48,8 +48,8 @@ class KidsPractice {
 
     // Calculate band height: each band = 100% / N of card height
     // Card aspect ratio: we want card to be roughly square-ish,
-    // with each row tall enough to type comfortably (~60-80px min)
-    const rowHeightPx = Math.max(64, Math.min(96, Math.floor((window.innerHeight - 200) / N)));
+    // with each row tall enough to type comfortably (~70-90px min for wrapped text)
+    const rowHeightPx = Math.max(72, Math.min(100, Math.floor((window.innerHeight - 180) / N)));
     const cardHeightPx = rowHeightPx * N;
 
     card.style.height = cardHeightPx + 'px';

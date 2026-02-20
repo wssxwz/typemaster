@@ -552,7 +552,6 @@ body.kids-practice-page {
   padding: 0 16px;
   /* height set by JS to equally divide the card */
   transition: background 0.4s ease;
-  overflow: hidden;
 }
 
 /* First row: match card's top rounded corners */
@@ -622,17 +621,16 @@ body.kids-practice-page {
 /* Chars display */
 .kids-chars-display {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0;
+  gap: 2px;
   font-family: 'Courier New', 'Roboto Mono', monospace;
   font-size: clamp(14px, 2.5vw, 22px);
   font-weight: 700;
-  letter-spacing: 0.5px;
-  line-height: 1;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
 }
 
 /* Locked rows: dim placeholder chars */
