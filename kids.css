@@ -97,15 +97,68 @@ body.kids-page::after {
 /* ---- Hero ---- */
 .kids-hero {
   text-align: center;
-  padding: 20px 20px 40px;
+  padding: 16px 20px 32px;
   position: relative;
   z-index: 1;
 }
 
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+/* Tree container */
+.tree-container {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.tree-container svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.tree-container:hover svg {
+  transform: scale(1.05) rotate(-2deg);
+}
+
+/* Tree stats */
+.tree-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50px;
+  margin: 0 auto 16px;
+  max-width: 420px;
+  font-size: 14px;
+  color: #666;
+}
+
+.tree-stats strong {
+  color: var(--kids-primary);
+  font-size: 16px;
+}
+
+.hero-content {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
 .kids-hero-emoji {
-  font-size: 72px;
+  font-size: 56px;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   animation: bounce 2s infinite;
 }
 
@@ -115,16 +168,16 @@ body.kids-page::after {
 }
 
 .kids-hero-title {
-  font-size: clamp(36px, 6vw, 64px);
+  font-size: clamp(32px, 5vw, 52px);
   font-weight: 900;
   color: var(--kids-primary);
-  text-shadow: 3px 3px 0 #ffb3d1, 5px 5px 0 rgba(255,107,157,0.2);
-  margin-bottom: 12px;
+  text-shadow: 2px 2px 0 #ffb3d1, 4px 4px 0 rgba(255,107,157,0.15);
+  margin-bottom: 6px;
   line-height: 1.1;
 }
 
 .kids-hero-sub {
-  font-size: clamp(16px, 2.5vw, 22px);
+  font-size: clamp(14px, 2vw, 18px);
   color: #888;
   font-weight: 600;
 }
@@ -200,6 +253,17 @@ body.kids-page::after {
   transform: translateY(-2px) scale(0.98);
 }
 
+.card-lang-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 20px;
+  background: rgba(255,255,255,0.85);
+  padding: 4px 8px;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
 .card-emoji {
   font-size: 80px;
   line-height: 1;
@@ -261,6 +325,45 @@ body.kids-page::after {
 .kids-animal-card:hover .card-start-btn {
   background: rgba(255,255,255,0.95);
   color: rgba(0,0,0,0.8);
+}
+
+/* ---- Language Filter ---- */
+.filter-section {
+  padding: 0 20px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.filter-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255,255,255,0.7);
+  color: #666;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.filter-tab:hover {
+  background: rgba(255,255,255,0.95);
+  transform: translateY(-2px);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #ff6b9d, #ffd93d);
+  color: white;
+  box-shadow: 0 4px 14px rgba(255,107,157,0.35);
 }
 
 /* ---- Footer ---- */

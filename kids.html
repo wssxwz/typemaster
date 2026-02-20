@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TypeKids 🐾 - 幼儿打字乐园</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="kids.css">
 </head>
 <body class="kids-page">
@@ -20,12 +19,33 @@
     <div class="kids-nav-badge">🎮 幼儿版</div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero + Tree -->
   <section class="kids-hero">
-    <span class="kids-hero-emoji">🐾</span>
-    <h1 class="kids-hero-title">TypeKids</h1>
-    <p class="kids-hero-sub">选一只小动物，开始打字冒险吧！</p>
+    <div class="hero-top-row">
+      <div class="tree-container" id="treeContainer">
+        <!-- SVG tree rendered by JS -->
+      </div>
+      <div class="hero-content">
+        <span class="kids-hero-emoji">🐾</span>
+        <h1 class="kids-hero-title">TypeKids</h1>
+        <p class="kids-hero-sub">选一只小动物，开始打字冒险吧！</p>
+      </div>
+    </div>
+    <div class="tree-stats" id="treeStats">
+      <span>📊 总字数：<strong id="totalChars">0</strong></span>
+      <span>📅 今天：<strong id="todayChars">0</strong></span>
+      <span>🌱 树龄：<strong id="treeDays">0</strong> 天</span>
+    </div>
     <div class="stars-row">⭐ ⭐ ⭐ ⭐ ⭐</div>
+  </section>
+
+  <!-- Language Filter -->
+  <section class="filter-section">
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-lang="all">全部</button>
+      <button class="filter-tab" data-lang="english">English</button>
+      <button class="filter-tab" data-lang="chinese">中文</button>
+    </div>
   </section>
 
   <!-- Animal Cards Grid -->

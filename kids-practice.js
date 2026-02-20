@@ -286,9 +286,15 @@ class KidsPractice {
   }
 
   showCompletion() {
+    // 计算总字数
+    const totalChars = this.animal.lines.reduce((sum, line) => sum + line.length, 0);
+
+    // 保存到 sessionStorage，首页会读取
+    sessionStorage.setItem('kidsCompleted', totalChars.toString());
+
     document.getElementById('completionAnimalEmoji').textContent = this.animal.emoji;
     document.getElementById('completionSubtitle').textContent =
-      `你解锁了完整的 ${this.animal.name}！`;
+      `你解锁了完整的 ${this.animal.name}！+${totalChars}字`;
     document.getElementById('kidsCompletionOverlay').classList.add('show');
     this.startConfetti();
   }
