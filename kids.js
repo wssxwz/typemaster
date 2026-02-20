@@ -198,9 +198,29 @@ function startAnimal(animalId) {
 // ============ 更新树统计 ============
 function updateTreeStats() {
   const state = TreeSystem.getState();
+  const isEn = currentFilter === 'english';
+
+  // 更新数字
   document.getElementById('totalChars').textContent = state.totalChars.toLocaleString();
   document.getElementById('todayChars').textContent = TreeSystem.getTodayChars().toLocaleString();
   document.getElementById('treeDays').textContent = TreeSystem.getTreeAge();
+
+  // 更新标签文字（通过父 span 元素）
+  const stats = document.getElementById('treeStats');
+  if (!stats) return;
+
+  const labels = stats.querySelectorAll('span');
+  if (labels[0]) labels[0].innerHTML = isEn
+    ? '📊 Total: <strong id="totalChars">' + state.totalChars.toLocaleString() + '</strong>'
+    : '📊 总字数：<strong id="totalChars">' + state.totalChars.toLocaleString() + '</strong>';
+
+  if (labels[1]) labels[1].innerHTML = isEn
+    ? '📅 Today: <strong id="todayChars">' + TreeSystem.getTodayChars().toLocaleString() + '</strong>'
+    : '📅 今天：<strong id="todayChars">' + TreeSystem.getTodayChars().toLocaleString() + '</strong>';
+
+  if (labels[2]) labels[2].innerHTML = isEn
+    ? '🌱 Age: <strong id="treeDays">' + TreeSystem.getTreeAge() + '</strong> days'
+    : '🌱 树龄：<strong id="treeDays">' + TreeSystem.getTreeAge() + '</strong> 天';
 }
 
 // ============ 语言筛选 ============
@@ -212,6 +232,7 @@ function setupFilterTabs() {
       e.target.classList.add('active');
       currentFilter = e.target.dataset.lang;
       renderAnimalCards();
+      updateTreeStats();  // 更新统计标签文字
     });
   });
 }
