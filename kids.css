@@ -329,41 +329,48 @@ body.kids-page::after {
 
 /* ---- Language Filter ---- */
 .filter-section {
-  padding: 0 20px 24px;
+  padding: 0 20px 28px;
   position: relative;
   z-index: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .filter-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.85);
+  border-radius: 50px;
+  padding: 5px;
+  gap: 4px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.04);
+  backdrop-filter: blur(10px);
 }
 
 .filter-tab {
-  padding: 10px 24px;
+  padding: 9px 22px;
   border: none;
   border-radius: 50px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  background: rgba(255,255,255,0.7);
-  color: #666;
-  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  background: transparent;
+  color: #999;
+  transition: all 0.2s ease;
   font-family: inherit;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 .filter-tab:hover {
-  background: rgba(255,255,255,0.95);
-  transform: translateY(-2px);
+  color: #ff6b9d;
+  background: rgba(255,107,157,0.08);
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #ff6b9d, #ffd93d);
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff9a6c 100%);
   color: white;
-  box-shadow: 0 4px 14px rgba(255,107,157,0.35);
+  box-shadow: 0 3px 12px rgba(255,107,157,0.4);
 }
 
 /* ---- Footer ---- */
