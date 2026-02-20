@@ -1,356 +1,353 @@
-// TypeKids - 幼儿版练习逻辑
-// 核心机制：每打完一行，解锁一行动物图片
+// TypeKids - 幼儿版练习逻辑 v2
+// 设计：统一区域 = 动物图片 + 打字条带叠加
+// 每打完一行，该行遮罩消失，图片逐渐显露
+// 输入：纯 keydown 事件，避免移动端 input 事件双触发
 
 class KidsPractice {
   constructor() {
     this.animal = null;
     this.currentLineIndex = 0;
-    this.userInput = '';
-    this.lineCompleted = []; // 每行是否完成
+    this.userInput = '';           // 当前行已输入的字符串
+    this.lineCompleted = [];
     this.confettiActive = false;
+    this.isComposing = false;      // IME 输入法组合状态
 
     this.init();
   }
 
   init() {
-    // Load animal
     const animalId = localStorage.getItem('kidsAnimalId') || 'panda';
     this.animal = kidsAnimals.find(a => a.id === animalId) || kidsAnimals[0];
     this.lineCompleted = new Array(this.animal.lines.length).fill(false);
 
-    // Setup UI
-    this.setupAnimalHeader();
-    this.setupAnimalReveal();
-    this.setupProgressStars();
-    this.renderLines();
+    this.setupHeader();
+    this.buildUnifiedCard();
+    this.updateProgressBadge();
     this.setupInput();
-
-    // Focus the typing area
     this.focusInput();
   }
 
-  setupAnimalHeader() {
+  setupHeader() {
     document.getElementById('practiceAnimalEmoji').textContent = this.animal.emoji;
-    document.getElementById('practiceAnimalName').textContent = this.animal.name + ' - ' + this.animal.nameEn;
+    document.getElementById('practiceAnimalName').textContent =
+      `${this.animal.name} · ${this.animal.nameEn}`;
     document.title = `TypeKids - ${this.animal.name}`;
   }
 
-  setupAnimalReveal() {
-    const svgLayer = document.getElementById('animalSvgLayer');
-    const maskContainer = document.getElementById('maskRowsContainer');
-    const totalLines = this.animal.lines.length;
+  /* ----------------------------------------------------------
+     Build the unified card:
+     - animal SVG as background (absolute, fills entire card)
+     - N typing band rows (relative, stacked, equal height)
+     ---------------------------------------------------------- */
+  buildUnifiedCard() {
+    const card = document.getElementById('unifiedCard');
+    const bgLayer = document.getElementById('animalBgLayer');
+    const overlay = document.getElementById('typingRowsOverlay');
 
-    // Inject SVG
-    svgLayer.innerHTML = this.animal.svg;
+    const N = this.animal.lines.length;
 
-    // Create mask rows (one per line)
-    maskContainer.innerHTML = '';
-    for (let i = 0; i < totalLines; i++) {
-      const row = document.createElement('div');
-      row.className = 'mask-row';
-      row.id = `mask-row-${i}`;
-      // Color hint on each mask row
-      row.style.background = i % 2 === 0 ? '#e0e0e0' : '#d5d5d5';
-      maskContainer.appendChild(row);
+    // Calculate band height: each band = 100% / N of card height
+    // Card aspect ratio: we want card to be roughly square-ish,
+    // with each row tall enough to type comfortably (~60-80px min)
+    const rowHeightPx = Math.max(64, Math.min(96, Math.floor((window.innerHeight - 200) / N)));
+    const cardHeightPx = rowHeightPx * N;
+
+    card.style.height = cardHeightPx + 'px';
+
+    // Inject animal SVG
+    bgLayer.innerHTML = this.animal.svg;
+
+    // Build overlay bands
+    overlay.innerHTML = '';
+    for (let i = 0; i < N; i++) {
+      const band = document.createElement('div');
+      band.className = 'typing-row-band ' + (i === 0 ? 'active' : 'locked');
+      band.id = `band-${i}`;
+      band.style.height = rowHeightPx + 'px';
+      band.style.minHeight = rowHeightPx + 'px';
+      band.style.maxHeight = rowHeightPx + 'px';
+
+      // State icon
+      const pill = document.createElement('span');
+      pill.className = 'row-state-pill';
+      pill.id = `pill-${i}`;
+      pill.textContent = i === 0 ? '✏️' : '🔒';
+      band.appendChild(pill);
+
+      // Chars display
+      const charsDiv = document.createElement('div');
+      charsDiv.className = 'kids-chars-display';
+      charsDiv.id = `chars-${i}`;
+      charsDiv.innerHTML = this.buildCharsHTML(i, '');
+      band.appendChild(charsDiv);
+
+      overlay.appendChild(band);
     }
   }
 
-  setupProgressStars() {
-    const row = document.getElementById('progressStarsRow');
-    const totalLines = this.animal.lines.length;
-    row.innerHTML = '';
-    for (let i = 0; i < totalLines; i++) {
-      const star = document.createElement('span');
-      star.className = 'progress-star';
-      star.id = `progress-star-${i}`;
-      star.textContent = '⭐';
-      row.appendChild(star);
-    }
+  buildCharsHTML(lineIndex, typedSoFar) {
+    const target = this.animal.lines[lineIndex];
+    return target.split('').map((ch, i) => {
+      let cls = 'k-char';
+      if (i < typedSoFar.length) {
+        cls += typedSoFar[i] === ch ? ' k-correct' : ' k-wrong';
+      } else if (i === typedSoFar.length && lineIndex === this.currentLineIndex) {
+        cls += ' k-current';
+      }
+      const display = ch === ' ' ? '&nbsp;' : ch;
+      return `<span class="${cls}">${display}</span>`;
+    }).join('');
   }
 
-  renderLines() {
-    const container = document.getElementById('kidsLinesContainer');
-    const totalLines = this.animal.lines.length;
-    container.innerHTML = '';
-
-    for (let i = 0; i < totalLines; i++) {
-      const row = document.createElement('div');
-      row.className = 'kids-line-row' + (i === 0 ? ' active' : '');
-      row.id = `line-row-${i}`;
-
-      const lineText = this.animal.lines[i];
-
-      row.innerHTML = `
-        <span class="line-number">${i + 1}</span>
-        <span class="line-lock-icon" id="lock-icon-${i}">${this.lineCompleted[i] ? '✅' : (i === 0 ? '✏️' : '🔒')}</span>
-        <div class="kids-chars-display" id="chars-display-${i}">
-          ${lineText.split('').map((ch, ci) => {
-            const cls = (i === 0 && ci === 0) ? 'k-char k-current' : 'k-char';
-            const display = ch === ' ' ? '&nbsp;' : ch;
-            return `<span class="${cls}" data-line="${i}" data-pos="${ci}">${display}</span>`;
-          }).join('')}
-        </div>
-      `;
-      container.appendChild(row);
-    }
+  updateProgressBadge() {
+    const done = this.lineCompleted.filter(Boolean).length;
+    const total = this.animal.lines.length;
+    const badge = document.getElementById('practiceProgressBadge');
+    if (badge) badge.textContent = `⭐ ${done} / ${total}`;
   }
 
+  /* ----------------------------------------------------------
+     INPUT HANDLING
+     Strategy: use ONLY keydown for desktop.
+     For mobile keyboards, use compositionstart/end + input.
+     Clear the hidden input value immediately after each event
+     to prevent accumulation that causes cursor jump.
+     ---------------------------------------------------------- */
   setupInput() {
     const input = document.getElementById('kidsHiddenInput');
-    const typingArea = document.getElementById('kidsTypingArea');
+    const card = document.getElementById('unifiedCard');
 
-    // Click typing area to focus
-    typingArea.addEventListener('click', () => this.focusInput());
+    // Click card → focus
+    card.addEventListener('click', () => this.focusInput());
+    document.addEventListener('click', () => this.focusInput());
 
-    // Global keydown
+    /* Desktop keyboard: keydown */
     document.addEventListener('keydown', (e) => {
+      // Ignore while IME is composing
+      if (this.isComposing) return;
+
       const overlay = document.getElementById('kidsCompletionOverlay');
       if (overlay.classList.contains('show')) return;
 
       if (e.key === 'Backspace') {
         e.preventDefault();
         this.handleBackspace();
-      } else if (e.key.length === 1) {
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
         this.handleChar(e.key);
       }
     });
 
-    // Mobile: use input event on hidden input
-    input.addEventListener('input', (e) => {
-      const val = e.target.value;
-      if (!val) return;
-      // Process each char
-      for (const ch of val) {
+    /* Mobile: track IME composition to avoid double-fire */
+    input.addEventListener('compositionstart', () => {
+      this.isComposing = true;
+    });
+
+    input.addEventListener('compositionend', (e) => {
+      this.isComposing = false;
+      // On mobile, composition end gives us the final character(s)
+      const data = e.data || '';
+      input.value = ''; // Clear immediately
+      for (const ch of data) {
         this.handleChar(ch);
       }
-      input.value = '';
+    });
+
+    /* Mobile input fallback: only fires if NOT in composition */
+    input.addEventListener('input', (e) => {
+      if (this.isComposing) return;
+      const val = input.value;
+      input.value = ''; // Clear immediately to prevent accumulation
+      if (!val) return;
+      for (const ch of val) {
+        if (ch === '\b') {
+          this.handleBackspace();
+        } else {
+          this.handleChar(ch);
+        }
+      }
     });
   }
 
   focusInput() {
-    document.getElementById('kidsHiddenInput').focus();
-    document.getElementById('typingAreaTip').textContent = '⌨️ 打对每一行，动物图片就出现啦！';
+    const input = document.getElementById('kidsHiddenInput');
+    input.focus();
+    // Keep cursor at end of empty string
+    input.value = '';
+    input.setSelectionRange(0, 0);
   }
 
   handleChar(ch) {
     if (this.currentLineIndex >= this.animal.lines.length) return;
-
-    const targetLine = this.animal.lines[this.currentLineIndex];
-    const maxLen = targetLine.length;
-
-    if (this.userInput.length >= maxLen) return; // Line full
+    const target = this.animal.lines[this.currentLineIndex];
+    if (this.userInput.length >= target.length) return;
 
     this.userInput += ch;
-    this.updateLineDisplay(this.currentLineIndex);
+    this.refreshBandChars(this.currentLineIndex);
 
-    // Check if line is fully typed
-    if (this.userInput.length === maxLen) {
-      // Check if correct
-      if (this.userInput === targetLine) {
-        setTimeout(() => this.unlockLine(this.currentLineIndex), 100);
-      }
+    // Check line completion
+    if (this.userInput.length === target.length && this.userInput === target) {
+      setTimeout(() => this.unlockCurrentLine(), 80);
     }
   }
 
   handleBackspace() {
     if (this.userInput.length === 0) return;
     this.userInput = this.userInput.slice(0, -1);
-    this.updateLineDisplay(this.currentLineIndex);
+    this.refreshBandChars(this.currentLineIndex);
   }
 
-  updateLineDisplay(lineIndex) {
-    const targetLine = this.animal.lines[lineIndex];
-    const charsContainer = document.getElementById(`chars-display-${lineIndex}`);
-    if (!charsContainer) return;
-
-    const spans = charsContainer.querySelectorAll('.k-char');
-    const typedLen = this.userInput.length;
-
-    spans.forEach((span, i) => {
-      span.classList.remove('k-correct', 'k-wrong', 'k-current');
-      if (i < typedLen) {
-        if (this.userInput[i] === targetLine[i]) {
-          span.classList.add('k-correct');
-        } else {
-          span.classList.add('k-wrong');
-        }
-      } else if (i === typedLen) {
-        span.classList.add('k-current');
-      }
-    });
+  refreshBandChars(lineIndex) {
+    const charsDiv = document.getElementById(`chars-${lineIndex}`);
+    if (!charsDiv) return;
+    charsDiv.innerHTML = this.buildCharsHTML(lineIndex, this.userInput);
   }
 
-  unlockLine(lineIndex) {
-    this.lineCompleted[lineIndex] = true;
+  unlockCurrentLine() {
+    const idx = this.currentLineIndex;
+    this.lineCompleted[idx] = true;
 
-    // Update line row UI -> completed style
-    const row = document.getElementById(`line-row-${lineIndex}`);
-    if (row) {
-      row.classList.remove('active');
-      row.classList.add('completed');
-    }
-
-    // Update lock icon
-    const lockIcon = document.getElementById(`lock-icon-${lineIndex}`);
-    if (lockIcon) lockIcon.textContent = '✅';
-
-    // Unlock progress star
-    const star = document.getElementById(`progress-star-${lineIndex}`);
-    if (star) star.classList.add('unlocked');
-
-    // Animate the mask row away
-    const maskRow = document.getElementById(`mask-row-${lineIndex}`);
-    if (maskRow) {
-      maskRow.classList.add('unlocking');
-      // Show sparkle
-      this.showSparkle(maskRow);
-      // After animation, hide permanently
+    // Update band: completed (transparent, image shows through)
+    const band = document.getElementById(`band-${idx}`);
+    if (band) {
+      band.classList.remove('active', 'locked');
+      band.classList.add('unlocking');
       setTimeout(() => {
-        maskRow.classList.add('unlocked');
-        maskRow.classList.remove('unlocking');
-      }, 650);
+        band.classList.remove('unlocking');
+        band.classList.add('completed');
+      }, 560);
     }
+
+    // Pill → check
+    const pill = document.getElementById(`pill-${idx}`);
+    if (pill) pill.textContent = '✅';
+
+    // Show sparkles
+    this.showSparkle(band);
+
+    // Add to completed log
+    this.addToLog(idx, this.animal.lines[idx]);
+
+    // Update progress badge
+    this.updateProgressBadge();
 
     // Move to next line
-    const nextLine = lineIndex + 1;
-
-    if (nextLine >= this.animal.lines.length) {
-      // All lines done!
-      setTimeout(() => this.showCompletion(), 800);
+    const next = idx + 1;
+    if (next >= this.animal.lines.length) {
+      setTimeout(() => this.showCompletion(), 700);
     } else {
-      this.currentLineIndex = nextLine;
+      this.currentLineIndex = next;
       this.userInput = '';
 
-      // Activate next row
-      const nextRow = document.getElementById(`line-row-${nextLine}`);
-      if (nextRow) {
-        nextRow.classList.add('active');
-        const lockIconNext = document.getElementById(`lock-icon-${nextLine}`);
-        if (lockIconNext) lockIconNext.textContent = '✏️';
-        // Reset chars display to all untyped
-        this.updateLineDisplay(nextLine);
-        // Scroll into view
-        nextRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      // Update reveal hint
-      const hint = document.getElementById('revealHint');
-      if (hint) {
-        hint.textContent = `🔓 已解锁 ${nextLine}/${this.animal.lines.length} 行！继续加油！`;
+      const nextBand = document.getElementById(`band-${next}`);
+      if (nextBand) {
+        nextBand.classList.remove('locked');
+        nextBand.classList.add('active');
+        const nextPill = document.getElementById(`pill-${next}`);
+        if (nextPill) nextPill.textContent = '✏️';
+        this.refreshBandChars(next);
+        nextBand.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
   }
 
-  showSparkle(element) {
-    const rect = element.getBoundingClientRect();
-    const emojis = ['✨', '⭐', '🌟', '💫', '🎉'];
-    const count = 4;
+  showSparkle(anchorEl) {
+    const rect = anchorEl
+      ? anchorEl.getBoundingClientRect()
+      : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 200 };
 
-    for (let i = 0; i < count; i++) {
-      const spark = document.createElement('div');
-      spark.className = 'sparkle-burst';
-      spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      spark.style.left = (rect.left + Math.random() * rect.width) + 'px';
-      spark.style.top = (rect.top + Math.random() * 30) + 'px';
-      document.body.appendChild(spark);
-      setTimeout(() => spark.remove(), 900);
+    const emojis = ['✨', '⭐', '🌟', '💫', '🎉', '🎊'];
+    for (let i = 0; i < 5; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle-burst';
+      s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      s.style.left = (rect.left + Math.random() * (rect.width || 200)) + 'px';
+      s.style.top  = (rect.top + 10) + 'px';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 900);
     }
+  }
+
+  addToLog(idx, text) {
+    const list = document.getElementById('completedLogList');
+    if (!list) return;
+
+    // Remove empty placeholder
+    const empty = list.querySelector('.completed-log-empty');
+    if (empty) empty.remove();
+
+    const item = document.createElement('div');
+    item.className = 'completed-log-item';
+    item.innerHTML = `
+      <span class="log-num">${idx + 1}.</span>
+      <span class="log-text">${text}</span>
+    `;
+    list.appendChild(item);
   }
 
   showCompletion() {
-    // Update reveal hint to full unlock
-    const hint = document.getElementById('revealHint');
-    if (hint) hint.textContent = '🎉 完整解锁！太厉害了！';
-
-    // Update overlay
     document.getElementById('completionAnimalEmoji').textContent = this.animal.emoji;
     document.getElementById('completionSubtitle').textContent =
       `你解锁了完整的 ${this.animal.name}！`;
-
-    // Show overlay
-    const overlay = document.getElementById('kidsCompletionOverlay');
-    overlay.classList.add('show');
-
-    // Start confetti
+    document.getElementById('kidsCompletionOverlay').classList.add('show');
     this.startConfetti();
   }
 
   startConfetti() {
     const canvas = document.getElementById('kidsConfettiCanvas');
-    canvas.width = window.innerWidth;
+    canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
+    const ctx    = canvas.getContext('2d');
+    const colors = ['#ff6b9d','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff8f00','#26c6da'];
+    const pieces = [];
 
-    const colors = ['#ff6b9d', '#ffd93d', '#6bcb77', '#4d96ff', '#c77dff', '#ff8f00', '#26c6da'];
-    const particles = [];
-
-    class ConfettiPiece {
-      constructor() {
-        this.reset();
-      }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = -20;
-        this.w = Math.random() * 12 + 6;
-        this.h = Math.random() * 6 + 4;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.vy = Math.random() * 3 + 2;
-        this.vx = (Math.random() - 0.5) * 2;
-        this.angle = Math.random() * Math.PI * 2;
-        this.spin = (Math.random() - 0.5) * 0.2;
-        this.alpha = 1;
-      }
-      update() {
-        this.y += this.vy;
-        this.x += this.vx;
-        this.angle += this.spin;
-        if (this.y > canvas.height) this.reset();
-      }
-      draw() {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
-        ctx.fillStyle = this.color;
-        ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
-        ctx.restore();
-      }
+    function makePiece() {
+      return {
+        x: Math.random() * canvas.width,
+        y: -20,
+        w: Math.random() * 12 + 6,
+        h: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: Math.random() * 3 + 2,
+        vx: (Math.random() - 0.5) * 2.5,
+        angle: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.18,
+      };
     }
 
-    for (let i = 0; i < 80; i++) {
-      const p = new ConfettiPiece();
-      p.y = Math.random() * canvas.height; // Spread initial positions
-      particles.push(p);
+    for (let i = 0; i < 90; i++) {
+      const p = makePiece();
+      p.y = Math.random() * canvas.height;
+      pieces.push(p);
     }
 
     const animate = () => {
-      if (!this.confettiActive) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
+      if (!this.confettiActive) { ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      pieces.forEach(p => {
+        p.y += p.vy; p.x += p.vx; p.angle += p.spin;
+        if (p.y > canvas.height) Object.assign(p, makePiece());
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
       requestAnimationFrame(animate);
     };
 
     this.confettiActive = true;
     animate();
-
-    // Stop after 5 seconds
-    setTimeout(() => {
-      this.confettiActive = false;
-    }, 5000);
+    setTimeout(() => { this.confettiActive = false; }, 5500);
   }
 
   restart() {
-    // Stop confetti
     this.confettiActive = false;
     const canvas = document.getElementById('kidsConfettiCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
-    // Hide overlay
     document.getElementById('kidsCompletionOverlay').classList.remove('show');
 
     // Reset state
@@ -358,20 +355,18 @@ class KidsPractice {
     this.userInput = '';
     this.lineCompleted = new Array(this.animal.lines.length).fill(false);
 
-    // Re-render
-    this.setupAnimalReveal();
-    this.setupProgressStars();
-    this.renderLines();
+    // Rebuild
+    this.buildUnifiedCard();
+    this.updateProgressBadge();
 
-    // Reset hint
-    document.getElementById('revealHint').textContent = '🔒 打完每一行，解锁一行图片！';
-    document.getElementById('typingAreaTip').textContent = '点击这里开始打字';
+    // Clear log
+    const list = document.getElementById('completedLogList');
+    list.innerHTML = '<span class="completed-log-empty">打对一行就会出现在这里～</span>';
 
     this.focusInput();
   }
 }
 
-// Init on load
 let kidsPractice;
 document.addEventListener('DOMContentLoaded', () => {
   kidsPractice = new KidsPractice();
