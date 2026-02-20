@@ -1,6 +1,6 @@
 // TypeKids - 幼儿版首页逻辑 + 成长树系统
 
-let currentFilter = 'all';
+let currentFilter = 'english';
 
 // ============ 成长树系统 ============
 const TreeSystem = {
@@ -161,20 +161,30 @@ function renderAnimalCards() {
     ? kidsAnimals
     : kidsAnimals.filter(a => a.language === currentFilter);
 
-  grid.innerHTML = filtered.map((animal, idx) => {
+  const isEn = currentFilter === 'english';
+
+  // 更新副标题
+  const sub = document.querySelector('.kids-hero-sub');
+  if (sub) sub.textContent = isEn
+    ? 'Pick an animal and start typing!'
+    : '选一只小动物，开始打字冒险吧！';
+
+  grid.innerHTML = filtered.map((animal) => {
     const starsHtml = '⭐'.repeat(animal.stars) + '☆'.repeat(4 - animal.stars);
-    const langBadge = animal.language === 'english' ? '🇬🇧' : '🇨🇳';
+    const displayName = isEn ? animal.nameEn : animal.name;
+    const displayDesc = isEn
+      ? (animal.descriptionEn || animal.description)
+      : animal.description;
+    const btnText = isEn ? 'Start →' : '开始练习 →';
     return `
       <div class="kids-animal-card"
            style="background: ${animal.color};"
            onclick="startAnimal('${animal.id}')">
-        <div class="card-lang-badge">${langBadge}</div>
         <span class="card-emoji">${animal.emoji}</span>
-        <div class="card-animal-name">${animal.name}</div>
-        <div class="card-animal-name-en">${animal.nameEn}</div>
-        <div class="card-desc">${animal.description}</div>
+        <div class="card-animal-name">${displayName}</div>
+        <div class="card-desc">${displayDesc}</div>
         <div class="card-stars">${starsHtml}</div>
-        <button class="card-start-btn">开始练习 →</button>
+        <button class="card-start-btn">${btnText}</button>
       </div>
     `;
   }).join('');

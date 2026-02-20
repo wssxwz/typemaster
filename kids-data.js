@@ -12,6 +12,7 @@ const kidsAnimals = [
     color: '#f8c8d4',
     stars: 1,
     description: '简单英文句子',
+    descriptionEn: 'Simple sentences',
     lines: [
       'Hello I am a panda bear.',
       'I love to eat bamboo.',
@@ -48,6 +49,7 @@ const kidsAnimals = [
     color: '#f3e5f5',
     stars: 1,
     description: '超短英文单词',
+    descriptionEn: 'Short words',
     lines: [
       'cat dog pig cow',
       'sun moon star sky',
@@ -86,6 +88,7 @@ const kidsAnimals = [
     color: '#b3e5fc',
     stars: 2,
     description: '数字和符号',
+    descriptionEn: 'Numbers & symbols',
     lines: [
       '1 2 3 4 5 6 7 8 9 0',
       '11 22 33 44 55 66',
@@ -104,6 +107,7 @@ const kidsAnimals = [
     color: '#fff9c4',
     stars: 2,
     description: '英文单词练习',
+    descriptionEn: 'Vocabulary words',
     lines: [
       'cat dog sun moon star',
       'red blue green yellow',
@@ -140,6 +144,7 @@ const kidsAnimals = [
     color: '#c8e6c9',
     stars: 2,
     description: '英文短句',
+    descriptionEn: 'Short sentences',
     lines: [
       'The sky is blue today.',
       'Birds fly in the air.',
@@ -178,6 +183,7 @@ const kidsAnimals = [
     color: '#e1bee7',
     stars: 3,
     description: '英文句子',
+    descriptionEn: 'Full sentences',
     lines: [
       'The sky is blue today.',
       'I see a yellow sun.',
@@ -214,6 +220,7 @@ const kidsAnimals = [
     color: '#aed581',
     stars: 3,
     description: '英文段落',
+    descriptionEn: 'Paragraphs',
     lines: [
       'I have a little frog.',
       'It likes to jump around.',
@@ -234,6 +241,7 @@ const kidsAnimals = [
     color: '#f8bbd9',
     stars: 4,
     description: '长英文句子',
+    descriptionEn: 'Long sentences',
     lines: [
       'Once upon a time there was a magical unicorn.',
       'It had a shiny golden horn on its forehead.',
@@ -270,6 +278,7 @@ const kidsAnimals = [
     color: '#90caf9',
     stars: 4,
     description: '海洋主题英文',
+    descriptionEn: 'Ocean theme',
     lines: [
       'The big blue whale swims in the ocean.',
       'It is the largest animal on our planet.',
@@ -306,6 +315,7 @@ const kidsAnimals = [
     color: '#bcaaa4',
     stars: 4,
     description: '知识主题',
+    descriptionEn: 'Knowledge theme',
     lines: [
       'The wise old owl sits in the tree.',
       'It watches everything with big round eyes.',
@@ -314,6 +324,122 @@ const kidsAnimals = [
       'The owl knows many secrets of the forest!'
     ],
     svg: makeAnimalSVG('owl')
+  },
+  // ===== English +2 =====
+  {
+    id: 'cat',
+    emoji: '🐱',
+    name: '小猫',
+    nameEn: 'Cat',
+    language: 'english',
+    color: '#fff9c4',
+    stars: 2,
+    description: 'Animal friends',
+    descriptionEn: 'Animal friends',
+    lines: [
+      'My cat has soft warm fur.',
+      'It likes to sleep all day.',
+      'It plays with a ball of yarn.',
+      'My cat drinks cold fresh milk.',
+      'I love my cute little cat!'
+    ],
+    svg: makeAnimalSVG('cat')
+  },
+  {
+    id: 'dog',
+    emoji: '🐶',
+    name: '小狗',
+    nameEn: 'Dog',
+    language: 'english',
+    color: '#fbe9e7',
+    stars: 2,
+    description: 'Best friends',
+    descriptionEn: 'Best friends',
+    lines: [
+      'My dog wags its fluffy tail.',
+      'It runs fast in the park.',
+      'My dog loves to play fetch.',
+      'It barks loud at the door.',
+      'Dogs are our best friends!'
+    ],
+    svg: makeAnimalSVG('dog')
+  },
+  // ===== Chinese +4 =====
+  {
+    id: 'monkey',
+    emoji: '🐵',
+    name: '小猴子',
+    nameEn: 'Monkey',
+    language: 'chinese',
+    color: '#fce4ec',
+    stars: 2,
+    description: '中文词语',
+    descriptionEn: 'Chinese words',
+    lines: [
+      '香蕉 苹果 桃子 西瓜',
+      '爬树 跳跃 奔跑 玩耍',
+      '聪明 活泼 快乐 顽皮',
+      '森林 山洞 河流 草地',
+      '我喜欢吃香蕉！'
+    ],
+    svg: makeAnimalSVG('monkey')
+  },
+  {
+    id: 'hamster',
+    emoji: '🐹',
+    name: '仓鼠',
+    nameEn: 'Hamster',
+    language: 'chinese',
+    color: '#fff3e0',
+    stars: 1,
+    description: '简单词语',
+    descriptionEn: 'Simple words',
+    lines: [
+      '大 小 多 少 好 坏',
+      '吃 喝 跑 跳 笑 哭',
+      '手 脚 眼 耳 口 鼻',
+      '红 黄 蓝 绿 白 黑',
+      '今天我很开心！'
+    ],
+    svg: makeAnimalSVG('hamster')
+  },
+  {
+    id: 'parrot',
+    emoji: '🦜',
+    name: '鹦鹉',
+    nameEn: 'Parrot',
+    language: 'chinese',
+    color: '#e8f5e9',
+    stars: 3,
+    description: '中文短句',
+    descriptionEn: 'Chinese sentences',
+    lines: [
+      '鹦鹉会学人说话真聪明。',
+      '它穿着绿色羽毛的外衣。',
+      '鹦鹉喜欢站在树枝上唱歌。',
+      '我们要好好爱护小动物。',
+      '动物是我们的好朋友！'
+    ],
+    svg: makeAnimalSVG('parrot')
+  },
+  {
+    id: 'horse',
+    emoji: '🐴',
+    name: '小马',
+    nameEn: 'Horse',
+    language: 'chinese',
+    color: '#f5f5f5',
+    stars: 4,
+    description: '成语故事',
+    descriptionEn: 'Idiom stories',
+    lines: [
+      '小马要过河不知道深浅。',
+      '老牛说水很浅可以过去。',
+      '小松鼠说水很深会淹死。',
+      '小马自己走进去试一试。',
+      '实践才能出真知识！'
+    ],
+    svg: makeAnimalSVG('horse')
   },
   {
     id: 'tiger',
@@ -637,6 +763,158 @@ function makeAnimalSVG(type) {
       <circle cx="190" cy="130" r="10" fill="#ffccbc" opacity="0.5"/>
     </svg>`
   };
+
+  // ---- 新增动物 SVG ----
+  svgs.cat = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#fff8e1" rx="20"/>
+    <ellipse cx="150" cy="210" rx="70" ry="65" fill="#ffca28"/>
+    <ellipse cx="150" cy="220" rx="42" ry="48" fill="#fff9c4"/>
+    <circle cx="150" cy="115" r="65" fill="#ffca28"/>
+    <polygon points="95,75 80,35 120,70" fill="#ffca28"/>
+    <polygon points="205,75 220,35 180,70" fill="#ffca28"/>
+    <polygon points="95,75 82,42 116,68" fill="#ffecb3"/>
+    <polygon points="205,75 218,42 184,68" fill="#ffecb3"/>
+    <ellipse cx="125" cy="108" rx="14" ry="16" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="108" rx="14" ry="16" fill="#1a1a1a"/>
+    <circle cx="125" cy="105" r="5" fill="white"/>
+    <circle cx="175" cy="105" r="5" fill="white"/>
+    <ellipse cx="150" cy="132" rx="10" ry="7" fill="#f06292"/>
+    <path d="M138 142 Q150 152 162 142" stroke="#f06292" stroke-width="2.5" fill="none"/>
+    <line x1="110" y1="138" x2="70" y2="130" stroke="#bbb" stroke-width="2"/>
+    <line x1="110" y1="143" x2="68" y2="143" stroke="#bbb" stroke-width="2"/>
+    <line x1="190" y1="138" x2="230" y2="130" stroke="#bbb" stroke-width="2"/>
+    <line x1="190" y1="143" x2="232" y2="143" stroke="#bbb" stroke-width="2"/>
+    <circle cx="112" cy="130" r="11" fill="#f8bbd0" opacity="0.5"/>
+    <circle cx="188" cy="130" r="11" fill="#f8bbd0" opacity="0.5"/>
+  </svg>`;
+
+  svgs.dog = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#fbe9e7" rx="20"/>
+    <ellipse cx="150" cy="210" rx="72" ry="66" fill="#d7a26a"/>
+    <ellipse cx="150" cy="220" rx="44" ry="50" fill="#f5deb3"/>
+    <circle cx="150" cy="115" r="65" fill="#d7a26a"/>
+    <ellipse cx="85" cy="95" rx="22" ry="40" fill="#c49a6c" transform="rotate(-15 85 95)"/>
+    <ellipse cx="215" cy="95" rx="22" ry="40" fill="#c49a6c" transform="rotate(15 215 95)"/>
+    <ellipse cx="125" cy="108" rx="14" ry="16" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="108" rx="14" ry="16" fill="#1a1a1a"/>
+    <circle cx="125" cy="105" r="5" fill="white"/>
+    <circle cx="175" cy="105" r="5" fill="white"/>
+    <ellipse cx="150" cy="138" rx="22" ry="16" fill="#f5deb3"/>
+    <ellipse cx="150" cy="133" rx="14" ry="9" fill="#c49a6c"/>
+    <path d="M138 148 Q150 158 162 148" stroke="#c49a6c" stroke-width="3" fill="none"/>
+    <circle cx="112" cy="132" r="10" fill="#ef9a9a" opacity="0.5"/>
+    <circle cx="188" cy="132" r="10" fill="#ef9a9a" opacity="0.5"/>
+  </svg>`;
+
+  svgs.deer = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#f1f8e9" rx="20"/>
+    <ellipse cx="150" cy="208" rx="72" ry="66" fill="#ce8a56"/>
+    <ellipse cx="150" cy="218" rx="44" ry="50" fill="#f5e6d3"/>
+    <circle cx="150" cy="112" r="63" fill="#ce8a56"/>
+    <path d="M85 80 Q60 45 45 25 Q65 30 75 55 Q55 35 65 60 Q80 50 85 80" fill="#a0522d"/>
+    <path d="M215 80 Q240 45 255 25 Q235 30 225 55 Q245 35 235 60 Q220 50 215 80" fill="#a0522d"/>
+    <ellipse cx="125" cy="108" rx="13" ry="15" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="108" rx="13" ry="15" fill="#1a1a1a"/>
+    <circle cx="125" cy="105" r="5" fill="white"/>
+    <circle cx="175" cy="105" r="5" fill="white"/>
+    <ellipse cx="150" cy="132" rx="12" ry="8" fill="#8b4513"/>
+    <path d="M138 142 Q150 153 162 142" stroke="#8b4513" stroke-width="2.5" fill="none"/>
+    <circle cx="113" cy="132" r="10" fill="#ffccbc" opacity="0.5"/>
+    <circle cx="187" cy="132" r="10" fill="#ffccbc" opacity="0.5"/>
+  </svg>`;
+
+  svgs.monkey = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#fce4ec" rx="20"/>
+    <ellipse cx="150" cy="208" rx="72" ry="66" fill="#a0522d"/>
+    <ellipse cx="150" cy="218" rx="45" ry="50" fill="#d2996f"/>
+    <circle cx="150" cy="112" r="63" fill="#a0522d"/>
+    <circle cx="80" cy="85" r="28" fill="#a0522d"/>
+    <circle cx="220" cy="85" r="28" fill="#a0522d"/>
+    <circle cx="80" cy="85" r="16" fill="#d2996f"/>
+    <circle cx="220" cy="85" r="16" fill="#d2996f"/>
+    <ellipse cx="150" cy="118" rx="48" ry="42" fill="#d2996f"/>
+    <ellipse cx="125" cy="105" rx="13" ry="15" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="105" rx="13" ry="15" fill="#1a1a1a"/>
+    <circle cx="125" cy="102" r="5" fill="white"/>
+    <circle cx="175" cy="102" r="5" fill="white"/>
+    <ellipse cx="150" cy="130" rx="16" ry="10" fill="#8b4513"/>
+    <path d="M138 140 Q150 150 162 140" stroke="#8b4513" stroke-width="3" fill="none"/>
+    <circle cx="110" cy="128" r="10" fill="#ffab91" opacity="0.6"/>
+    <circle cx="190" cy="128" r="10" fill="#ffab91" opacity="0.6"/>
+  </svg>`;
+
+  svgs.hamster = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#fff3e0" rx="20"/>
+    <ellipse cx="150" cy="212" rx="70" ry="65" fill="#ffb74d"/>
+    <ellipse cx="150" cy="222" rx="42" ry="48" fill="#ffe0b2"/>
+    <circle cx="150" cy="115" r="60" fill="#ffb74d"/>
+    <ellipse cx="85" cy="120" rx="30" ry="24" fill="#ffb74d"/>
+    <ellipse cx="215" cy="120" rx="30" ry="24" fill="#ffb74d"/>
+    <circle cx="90" cy="75" r="20" fill="#ffb74d"/>
+    <circle cx="210" cy="75" r="20" fill="#ffb74d"/>
+    <circle cx="90" cy="75" r="11" fill="#ffe0b2"/>
+    <circle cx="210" cy="75" r="11" fill="#ffe0b2"/>
+    <ellipse cx="125" cy="108" rx="13" ry="15" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="108" rx="13" ry="15" fill="#1a1a1a"/>
+    <circle cx="125" cy="105" r="5" fill="white"/>
+    <circle cx="175" cy="105" r="5" fill="white"/>
+    <ellipse cx="150" cy="130" rx="10" ry="7" fill="#e65100"/>
+    <path d="M140 140 Q150 150 160 140" stroke="#e65100" stroke-width="2.5" fill="none"/>
+    <circle cx="112" cy="128" r="12" fill="#ffccbc" opacity="0.5"/>
+    <circle cx="188" cy="128" r="12" fill="#ffccbc" opacity="0.5"/>
+  </svg>`;
+
+  svgs.parrot = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#e8f5e9" rx="20"/>
+    <ellipse cx="150" cy="210" rx="68" ry="72" fill="#4caf50"/>
+    <ellipse cx="150" cy="218" rx="40" ry="52" fill="#a5d6a7"/>
+    <circle cx="150" cy="108" r="62" fill="#4caf50"/>
+    <path d="M120 65 Q105 40 95 25 Q115 38 120 65" fill="#ffeb3b"/>
+    <ellipse cx="125" cy="100" rx="15" ry="17" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="100" rx="15" ry="17" fill="#1a1a1a"/>
+    <circle cx="125" cy="98" r="6" fill="white"/>
+    <circle cx="175" cy="98" r="6" fill="white"/>
+    <path d="M135 122 Q150 118 165 122 Q158 136 150 138 Q142 136 135 122Z" fill="#ff9800"/>
+    <circle cx="110" cy="122" r="12" fill="#ff5722" opacity="0.4"/>
+    <circle cx="190" cy="122" r="12" fill="#ff5722" opacity="0.4"/>
+    <path d="M95 175 Q70 160 65 190" stroke="#388e3c" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M205 175 Q230 160 235 190" stroke="#388e3c" stroke-width="10" fill="none" stroke-linecap="round"/>
+  </svg>`;
+
+  svgs.horse = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#f5f5f5" rx="20"/>
+    <ellipse cx="150" cy="205" rx="75" ry="68" fill="#bdbdbd"/>
+    <ellipse cx="150" cy="215" rx="45" ry="52" fill="#e0e0e0"/>
+    <circle cx="150" cy="110" r="63" fill="#bdbdbd"/>
+    <path d="M95 68 Q80 30 75 10 Q95 25 100 55 Q88 35 95 68" fill="#9e9e9e"/>
+    <path d="M115 62 Q105 28 108 10 Q122 22 120 52 Q113 32 115 62" fill="#9e9e9e"/>
+    <ellipse cx="125" cy="105" rx="13" ry="15" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="105" rx="13" ry="15" fill="#1a1a1a"/>
+    <circle cx="125" cy="103" r="5" fill="white"/>
+    <circle cx="175" cy="103" r="5" fill="white"/>
+    <ellipse cx="150" cy="132" rx="20" ry="14" fill="#e0e0e0"/>
+    <ellipse cx="150" cy="128" rx="10" ry="7" fill="#9e9e9e"/>
+    <path d="M138 142 Q150 152 162 142" stroke="#9e9e9e" stroke-width="3" fill="none"/>
+    <circle cx="112" cy="130" r="10" fill="#ef9a9a" opacity="0.4"/>
+    <circle cx="188" cy="130" r="10" fill="#ef9a9a" opacity="0.4"/>
+  </svg>`;
+
+  svgs.duck = `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#e3f2fd" rx="20"/>
+    <rect x="0" y="210" width="300" height="90" fill="#64b5f6" opacity="0.35"/>
+    <ellipse cx="150" cy="195" rx="75" ry="62" fill="#fdd835"/>
+    <ellipse cx="150" cy="205" rx="48" ry="45" fill="#fff9c4"/>
+    <circle cx="150" cy="110" r="60" fill="#fdd835"/>
+    <ellipse cx="125" cy="103" rx="14" ry="16" fill="#1a1a1a"/>
+    <ellipse cx="175" cy="103" rx="14" ry="16" fill="#1a1a1a"/>
+    <circle cx="125" cy="100" r="5" fill="white"/>
+    <circle cx="175" cy="100" r="5" fill="white"/>
+    <path d="M125 128 Q150 122 175 128 Q168 148 150 150 Q132 148 125 128Z" fill="#ff8f00"/>
+    <circle cx="112" cy="125" r="11" fill="#fff176" opacity="0.5"/>
+    <circle cx="188" cy="125" r="11" fill="#fff176" opacity="0.5"/>
+    <path d="M85 185 Q65 165 70 185 Q60 178 65 200" stroke="#fdd835" stroke-width="12" fill="none" stroke-linecap="round"/>
+  </svg>`;
+
   return svgs[type] || svgs.panda;
 }
 
