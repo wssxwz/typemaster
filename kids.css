@@ -555,6 +555,16 @@ body.kids-practice-page {
   overflow: hidden;
 }
 
+/* First row: match card's top rounded corners */
+.typing-row-band:first-child {
+  border-radius: 28px 28px 0 0;
+}
+
+/* Last row: match card's bottom rounded corners */
+.typing-row-band:last-child {
+  border-radius: 0 0 28px 28px;
+}
+
 /* Locked rows: semi-opaque cover hiding the image behind */
 .typing-row-band.locked {
   background: rgba(220, 220, 220, 0.88);
