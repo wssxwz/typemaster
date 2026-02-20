@@ -459,6 +459,16 @@ body.kids-practice-page {
   transform: translateX(-2px);
 }
 
+.back-btn-text {
+  display: none;
+}
+
+@media (min-width: 480px) {
+  .back-btn-text {
+    display: inline;
+  }
+}
+
 .practice-title-area {
   display: flex;
   align-items: center;
@@ -481,15 +491,36 @@ body.kids-practice-page {
   text-overflow: ellipsis;
 }
 
-.practice-progress-badge {
+/* Stats Panel */
+.practice-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.mini-stat-icon {
   font-size: 14px;
-  font-weight: 800;
-  color: white;
-  background: linear-gradient(135deg, #ff6b9d, #ffd93d);
-  padding: 6px 14px;
-  border-radius: 50px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(255,107,157,0.35);
+}
+
+.mini-stat-value {
+  font-size: 13px;
+  color: var(--kids-text);
+  min-width: 32px;
+  text-align: right;
 }
 
 /* ---- Main practice layout ---- */
@@ -841,7 +872,41 @@ body.kids-practice-page {
 .completion-subtitle {
   font-size: 16px;
   color: #aaa;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
+}
+
+/* Final Stats */
+.completion-final-stats {
+  background: rgba(255,255,255,0.7);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.completion-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.completion-stat-row:last-child {
+  border-bottom: none;
+}
+
+.completion-stat-row .stat-label {
+  font-size: 14px;
+  color: #888;
+  font-weight: 600;
+}
+
+.completion-stat-row .stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--kids-primary);
+  min-width: 60px;
+  text-align: right;
 }
 
 .completion-confetti {

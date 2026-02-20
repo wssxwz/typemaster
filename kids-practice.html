@@ -14,13 +14,27 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
       </svg>
-      换动物
+      <span class="back-btn-text">换动物</span>
     </a>
     <div class="practice-title-area">
       <span class="practice-animal-emoji" id="practiceAnimalEmoji">🐾</span>
       <span class="practice-animal-name" id="practiceAnimalName">加载中...</span>
     </div>
-    <div class="practice-progress-badge" id="practiceProgressBadge">0 / 5</div>
+    <!-- Stats Panel -->
+    <div class="practice-stats" id="practiceStats">
+      <div class="mini-stat">
+        <span class="mini-stat-icon">⏱️</span>
+        <span class="mini-stat-value" id="timerValue">0:00</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-icon">🚀</span>
+        <span class="mini-stat-value" id="wpmValue">0</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-icon">✅</span>
+        <span class="mini-stat-value" id="accuracyValue">100%</span>
+      </div>
+    </div>
   </nav>
 
   <!-- Main: unified animal + typing zone -->
@@ -68,6 +82,23 @@
       <span class="completion-animal-big" id="completionAnimalEmoji">🐼</span>
       <div class="completion-title">太棒了！🎉</div>
       <div class="completion-subtitle" id="completionSubtitle">你解锁了完整的 熊猫！</div>
+
+      <!-- Final Stats -->
+      <div class="completion-final-stats" id="completionFinalStats">
+        <div class="completion-stat-row">
+          <span class="stat-label">⏱️ 用时</span>
+          <span class="stat-value">0:00</span>
+        </div>
+        <div class="completion-stat-row">
+          <span class="stat-label">🚀 速度</span>
+          <span class="stat-value">0 WPM</span>
+        </div>
+        <div class="completion-stat-row">
+          <span class="stat-label">✅ 准确率</span>
+          <span class="stat-value">100%</span>
+        </div>
+      </div>
+
       <div class="completion-confetti">🎊 🌟 🎈 🌈</div>
       <div class="completion-btns">
         <button class="btn-kids-secondary" onclick="kidsPractice.restart()">再来一次 🔄</button>

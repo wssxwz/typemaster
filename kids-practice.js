@@ -12,6 +12,13 @@ class KidsPractice {
     this.confettiActive = false;
     this.isComposing = false;      // IME 输入法组合状态
 
+    // Timer & Stats
+    this.startTime = null;
+    this.timerInterval = null;
+    this.isStarted = false;
+    this.totalCharsTyped = 0;
+    this.totalErrors = 0;
+
     this.init();
   }
 
@@ -25,6 +32,7 @@ class KidsPractice {
     this.updateProgressBadge();
     this.setupInput();
     this.focusInput();
+    this.startTimer();  // 开始计时
   }
 
   setupHeader() {
@@ -106,6 +114,64 @@ class KidsPractice {
     if (badge) badge.textContent = `⭐ ${done} / ${total}`;
   }
 
+  // ============ Timer & Stats ============
+  startTimer() {
+    this.startTime = Date.now();
+    this.timerInterval = setInterval(() => {
+      this.updateTimer();
+      this.updateStats();
+    }, 500);
+  }
+
+  updateTimer() {
+    if (!this.startTime) return;
+    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    const timerEl = document.getElementById('timerValue');
+    if (timerEl) timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  updateStats() {
+    if (!this.isStarted || !this.startTime) return;
+
+    // Time in minutes
+    const timeMinutes = (Date.now() - this.startTime) / 1000 / 60;
+
+    // WPM (Words Per Minute): 5 chars = 1 word
+    const wordsTyped = this.totalCharsTyped / 5;
+    const wpm = timeMinutes > 0 ? Math.round(wordsTyped / timeMinutes) : 0;
+
+    // Accuracy
+    const accuracy = this.totalCharsTyped > 0
+      ? Math.round(((this.totalCharsTyped - this.totalErrors) / this.totalCharsTyped) * 100)
+      : 100;
+
+    // Update display
+    const wpmEl = document.getElementById('wpmValue');
+    const accEl = document.getElementById('accuracyValue');
+    if (wpmEl) wpmEl.textContent = wpm;
+    if (accEl) accEl.textContent = `${accuracy}%`;
+  }
+
+  stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  getFinalStats() {
+    const timeEl = document.getElementById('timerValue');
+    const wpmEl = document.getElementById('wpmValue');
+    const accEl = document.getElementById('accuracyValue');
+    return {
+      time: timeEl ? timeEl.textContent : '0:00',
+      wpm: wpmEl ? wpmEl.textContent : '0',
+      accuracy: accEl ? accEl.textContent : '100%'
+    };
+  }
+
   /* ----------------------------------------------------------
      INPUT HANDLING
      Strategy: use ONLY keydown for desktop.
@@ -182,8 +248,21 @@ class KidsPractice {
     const target = this.animal.lines[this.currentLineIndex];
     if (this.userInput.length >= target.length) return;
 
+    // Start timer on first char
+    if (!this.isStarted && this.currentLineIndex === 0 && this.userInput.length === 0) {
+      this.isStarted = true;
+    }
+
+    // Check if correct before adding
+    const expectedChar = target[this.userInput.length];
+    if (ch !== expectedChar) {
+      this.totalErrors++;
+    }
+
     this.userInput += ch;
+    this.totalCharsTyped++;
     this.refreshBandChars(this.currentLineIndex);
+    this.updateStats();
 
     // Check line completion
     if (this.userInput.length === target.length && this.userInput === target) {
@@ -286,15 +365,41 @@ class KidsPractice {
   }
 
   showCompletion() {
+    // 停止计时器
+    this.stopTimer();
+
     // 计算总字数
     const totalChars = this.animal.lines.reduce((sum, line) => sum + line.length, 0);
 
     // 保存到 sessionStorage，首页会读取
     sessionStorage.setItem('kidsCompleted', totalChars.toString());
 
+    // 获取最终统计
+    const stats = this.getFinalStats();
+
     document.getElementById('completionAnimalEmoji').textContent = this.animal.emoji;
     document.getElementById('completionSubtitle').textContent =
-      `你解锁了完整的 ${this.animal.name}！+${totalChars}字`;
+      `你解锁了完整的 ${this.animal.name}！`;
+
+    // 显示最终统计
+    const finalStatsEl = document.getElementById('completionFinalStats');
+    if (finalStatsEl) {
+      finalStatsEl.innerHTML = `
+        <div class="completion-stat-row">
+          <span class="stat-label">⏱️ 用时</span>
+          <span class="stat-value">${stats.time}</span>
+        </div>
+        <div class="completion-stat-row">
+          <span class="stat-label">🚀 速度</span>
+          <span class="stat-value">${stats.wpm} WPM</span>
+        </div>
+        <div class="completion-stat-row">
+          <span class="stat-label">✅ 准确率</span>
+          <span class="stat-value">${stats.accuracy}</span>
+        </div>
+      `;
+    }
+
     document.getElementById('kidsCompletionOverlay').classList.add('show');
     this.startConfetti();
   }
@@ -356,10 +461,22 @@ class KidsPractice {
 
     document.getElementById('kidsCompletionOverlay').classList.remove('show');
 
+    // Stop timer
+    this.stopTimer();
+
     // Reset state
     this.currentLineIndex = 0;
     this.userInput = '';
     this.lineCompleted = new Array(this.animal.lines.length).fill(false);
+    this.isStarted = false;
+    this.totalCharsTyped = 0;
+    this.totalErrors = 0;
+    this.startTime = null;
+
+    // Reset stats display
+    document.getElementById('timerValue').textContent = '0:00';
+    document.getElementById('wpmValue').textContent = '0';
+    document.getElementById('accuracyValue').textContent = '100%';
 
     // Rebuild
     this.buildUnifiedCard();
@@ -369,6 +486,8 @@ class KidsPractice {
     const list = document.getElementById('completedLogList');
     list.innerHTML = '<span class="completed-log-empty">打对一行就会出现在这里～</span>';
 
+    // Restart timer
+    this.startTimer();
     this.focusInput();
   }
 }
