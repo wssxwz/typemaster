@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeKids 练习</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="kids.css">
+</head>
+<body class="kids-practice-page">
+
+  <!-- Navigation -->
+  <nav class="kids-practice-nav">
+    <a href="kids.html" class="practice-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      换动物
+    </a>
+    <div class="practice-title-area">
+      <span class="practice-animal-emoji" id="practiceAnimalEmoji">🐾</span>
+      <span class="practice-animal-name" id="practiceAnimalName">加载中...</span>
+    </div>
+  </nav>
+
+  <!-- Progress Strip -->
+  <div class="kids-progress-strip">
+    <span class="progress-label">⭐ 解锁进度：</span>
+    <div class="progress-stars-row" id="progressStarsRow">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <main class="kids-practice-main">
+
+    <!-- Animal Reveal Section -->
+    <div class="animal-reveal-container">
+      <div class="animal-reveal-inner" id="animalRevealInner">
+        <!-- SVG layer -->
+        <div class="animal-svg-layer" id="animalSvgLayer"></div>
+        <!-- Mask rows layer (on top of SVG) -->
+        <div class="mask-rows-container" id="maskRowsContainer"></div>
+      </div>
+      <div class="reveal-hint" id="revealHint">🔒 打完每一行，解锁一行图片！</div>
+    </div>
+
+    <!-- Typing Area -->
+    <div class="kids-typing-area" id="kidsTypingArea">
+      <div class="typing-area-header">
+        <span class="tip-icon">⌨️</span>
+        <span id="typingAreaTip">点击这里开始打字</span>
+      </div>
+      <div class="kids-lines-container" id="kidsLinesContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Hidden input for capturing keystrokes -->
+  <input type="text"
+         class="kids-hidden-input"
+         id="kidsHiddenInput"
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false">
+
+  <!-- Confetti Canvas -->
+  <canvas id="kidsConfettiCanvas"></canvas>
+
+  <!-- Completion Overlay -->
+  <div class="kids-completion-overlay" id="kidsCompletionOverlay">
+    <div class="kids-completion-card">
+      <span class="completion-animal-big" id="completionAnimalEmoji">🐼</span>
+      <div class="completion-title">太棒了！🎉</div>
+      <div class="completion-subtitle" id="completionSubtitle">你解锁了完整的 熊猫！</div>
+      <div class="completion-confetti">🎊 🌟 🎈 🌈</div>
+      <div class="completion-btns">
+        <button class="btn-kids-secondary" onclick="kidsPractice.restart()">再来一次 🔄</button>
+        <button class="btn-kids-primary" onclick="window.location.href='kids.html'">换个动物 🐾</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="kids-data.js"></script>
+  <script src="kids-practice.js"></script>
+</body>
+</html>
