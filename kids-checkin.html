@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的成长树 🌳</title>
+  <link rel="stylesheet" href="kids.css">
+  <style>
+    /* ==============================
+       打卡页专属样式
+       ============================== */
+    body.checkin-page {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', -apple-system, sans-serif;
+      background: linear-gradient(160deg, #f0fdf4 0%, #fdf4ff 50%, #fffbf0 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- Nav ---- */
+    .checkin-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .checkin-nav-title {
+      flex: 1;
+      font-size: 18px;
+      font-weight: 900;
+      color: #3d2b1f;
+    }
+
+    /* ---- Main layout ---- */
+    .checkin-main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ==============================
+       HERO: 大树展示
+       ============================== */
+    .tree-hero {
+      background: linear-gradient(145deg, #e8f5e9, #f1f8e9);
+      border-radius: 32px;
+      padding: 32px 24px 24px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(76,175,80,0.12);
+      border: 2px solid rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tree-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 80%, rgba(129,199,132,0.2) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .big-tree-container {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 16px;
+      filter: drop-shadow(0 8px 20px rgba(56,142,60,0.2));
+    }
+
+    .tree-stage-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #388e3c;
+      box-shadow: 0 2px 8px rgba(56,142,60,0.15);
+      margin-bottom: 12px;
+    }
+
+    .tree-stage-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+      display: inline-block;
+      animation: pulse 1.5s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Progress to next stage */
+    .stage-progress-wrap {
+      margin-top: 16px;
+    }
+
+    .stage-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #888;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stage-progress-bar {
+      height: 10px;
+      background: rgba(0,0,0,0.08);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .stage-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #66bb6a, #aed581);
+      border-radius: 50px;
+      transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .stage-progress-tip {
+      font-size: 12px;
+      color: #aaa;
+      text-align: right;
+      margin-top: 5px;
+    }
+
+    /* ==============================
+       STATS 三格
+       ============================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 24px;
+      padding: 18px 12px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 2px solid rgba(255,255,255,0.8);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-card-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .stat-card-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: #3d2b1f;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-card-label {
+      font-size: 11px;
+      color: #bbb;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ==============================
+       每日热力图
+       ============================== */
+    .heatmap-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #3d2b1f;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 7列×N行的打卡格子 */
+    .heatmap-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .heatmap-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .heatmap-day-labels {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .heatmap-day-label {
+      text-align: center;
+      font-size: 10px;
+      color: #ccc;
+      font-weight: 700;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: #f5f5f5;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .heatmap-cell:hover {
+      transform: scale(1.2);
+      z-index: 2;
+    }
+
+    .heatmap-cell.level-0 { background: #f0f0f0; }
+    .heatmap-cell.level-1 { background: #c8e6c9; }
+    .heatmap-cell.level-2 { background: #81c784; }
+    .heatmap-cell.level-3 { background: #4caf50; }
+    .heatmap-cell.level-4 { background: #2e7d32; }
+
+    .heatmap-cell.today {
+      box-shadow: 0 0 0 2px #ff6b9d;
+    }
+
+    .heatmap-cell.future {
+      background: transparent;
+      border: 1px dashed #eee;
+      cursor: default;
+    }
+
+    .heatmap-tooltip {
+      position: fixed;
+      background: rgba(50,50,50,0.9);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+      display: none;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      justify-content: flex-end;
+    }
+
+    .heatmap-legend-label {
+      font-size: 11px;
+      color: #ccc;
+      font-weight: 600;
+    }
+
+    .heatmap-legend-cell {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+
+    /* ==============================
+       连续打卡 streak
+       ============================== */
+    .streak-card {
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffd93d 100%);
+      border-radius: 24px;
+      padding: 20px;
+      color: white;
+      box-shadow: 0 8px 24px rgba(255,107,157,0.25);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .streak-flame {
+      font-size: 52px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+      animation: flicker 1.5s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { transform: scale(1) rotate(-3deg); }
+      50% { transform: scale(1.08) rotate(3deg); }
+    }
+
+    .streak-info {
+      flex: 1;
+    }
+
+    .streak-number {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .streak-label {
+      font-size: 14px;
+      opacity: 0.9;
+      font-weight: 700;
+    }
+
+    .streak-sub {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    /* ==============================
+       每日字数柱状图
+       ============================== */
+    .bar-chart-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 100px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+
+    .bar-chart::after {
+      content: '';
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #f0f0f0;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .bar-fill {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, #66bb6a, #a5d6a7);
+      min-height: 3px;
+      transition: height 0.8s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+
+    .bar-fill.today-bar {
+      background: linear-gradient(180deg, #ff6b9d, #ffb3d1);
+    }
+
+    .bar-label {
+      position: absolute;
+      bottom: 0;
+      font-size: 9px;
+      color: #ccc;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ==============================
+       激励语
+       ============================== */
+    .motivation-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .motivation-text {
+      font-size: 16px;
+      font-weight: 800;
+      color: #3d2b1f;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .motivation-sub {
+      font-size: 13px;
+      color: #bbb;
+    }
+
+    /* tooltip */
+    #heatmapTooltip {
+      position: fixed;
+      background: rgba(40,40,40,0.92);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+      display: none;
+      font-family: 'Comic Sans MS', sans-serif;
+    }
+  </style>
+</head>
+<body class="checkin-page">
+
+  <!-- Nav -->
+  <nav class="checkin-nav">
+    <a href="kids.html" class="practice-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </a>
+    <div class="checkin-nav-title">🌳 我的成长树</div>
+  </nav>
+
+  <main class="checkin-main">
+
+    <!-- ① 大树展示 -->
+    <div class="tree-hero">
+      <div class="big-tree-container" id="bigTreeContainer"></div>
+
+      <div class="tree-stage-label">
+        <span class="tree-stage-dot"></span>
+        <span id="stageLabel">第 1 阶段 · 小树苗</span>
+      </div>
+
+      <div class="stage-progress-wrap">
+        <div class="stage-progress-labels">
+          <span id="progressFrom">0</span>
+          <span id="progressTo">下一阶段</span>
+        </div>
+        <div class="stage-progress-bar">
+          <div class="stage-progress-fill" id="stageProgressFill" style="width:0%"></div>
+        </div>
+        <div class="stage-progress-tip" id="progressTip">再打 500 字，小树就长大啦！</div>
+      </div>
+    </div>
+
+    <!-- ② 三格统计 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon">📝</div>
+        <div class="stat-card-value" id="statTotalChars">0</div>
+        <div class="stat-card-label">总字数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">📅</div>
+        <div class="stat-card-value" id="statTodayChars">0</div>
+        <div class="stat-card-label">今日字数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🗓️</div>
+        <div class="stat-card-value" id="statTreeAge">1</div>
+        <div class="stat-card-label">练习天数</div>
+      </div>
+    </div>
+
+    <!-- ③ 连续打卡 -->
+    <div class="streak-card" id="streakCard">
+      <div class="streak-flame">🔥</div>
+      <div class="streak-info">
+        <div class="streak-number" id="streakNumber">0</div>
+        <div class="streak-label">天连续打卡</div>
+        <div class="streak-sub" id="streakSub">今天打卡，开始你的连续记录！</div>
+      </div>
+    </div>
+
+    <!-- ④ 近14天字数柱状图 -->
+    <div class="bar-chart-card">
+      <div class="section-title">📊 近14天字数</div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+
+    <!-- ⑤ 热力图 (近10周) -->
+    <div class="heatmap-card">
+      <div class="section-title">🗓️ 打卡日历</div>
+      <div class="heatmap-day-labels">
+        <div class="heatmap-day-label">一</div>
+        <div class="heatmap-day-label">二</div>
+        <div class="heatmap-day-label">三</div>
+        <div class="heatmap-day-label">四</div>
+        <div class="heatmap-day-label">五</div>
+        <div class="heatmap-day-label">六</div>
+        <div class="heatmap-day-label">日</div>
+      </div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div class="heatmap-legend">
+        <span class="heatmap-legend-label">少</span>
+        <div class="heatmap-legend-cell" style="background:#f0f0f0"></div>
+        <div class="heatmap-legend-cell" style="background:#c8e6c9"></div>
+        <div class="heatmap-legend-cell" style="background:#81c784"></div>
+        <div class="heatmap-legend-cell" style="background:#4caf50"></div>
+        <div class="heatmap-legend-cell" style="background:#2e7d32"></div>
+        <span class="heatmap-legend-label">多</span>
+      </div>
+    </div>
+
+    <!-- ⑥ 激励语 -->
+    <div class="motivation-card">
+      <div class="motivation-text" id="motivationText">🌱 每天一点点，小树慢慢长！</div>
+      <div class="motivation-sub" id="motivationSub">坚持是最好的礼物</div>
+    </div>
+
+  </main>
+
+  <!-- Tooltip -->
+  <div id="heatmapTooltip"></div>
+
+  <script src="kids-data.js"></script>
+  <script src="kids-checkin.js"></script>
+</body>
+</html>
