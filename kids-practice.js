@@ -62,8 +62,11 @@ class KidsPractice {
 
     card.style.height = cardHeightPx + 'px';
 
-    // Inject animal SVG
-    bgLayer.innerHTML = this.animal.svg;
+    // Inject animal photo (real photo preferred, SVG fallback)
+    const photoHTML = (typeof getAnimalPhotoHTML !== 'undefined')
+      ? getAnimalPhotoHTML(this.animal.id)
+      : '';
+    bgLayer.innerHTML = photoHTML || this.animal.svg;
 
     // Build overlay bands
     overlay.innerHTML = '';

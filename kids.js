@@ -176,11 +176,20 @@ function renderAnimalCards() {
       ? (animal.descriptionEn || animal.description)
       : animal.description;
     const btnText = isEn ? 'Start →' : '开始练习 →';
+    // 真实照片或 emoji fallback
+    const photoUrl = (typeof ANIMAL_PHOTOS !== 'undefined') ? ANIMAL_PHOTOS[animal.id] : null;
+    const thumbHTML = photoUrl
+      ? `<div class="card-photo-wrap">
+           <img src="${photoUrl}" alt="${animal.nameEn}" class="card-animal-photo"
+                loading="lazy" onerror="this.parentElement.innerHTML='<span class=card-emoji-fallback>${animal.emoji}</span>'">
+         </div>`
+      : `<span class="card-emoji">${animal.emoji}</span>`;
+
     return `
       <div class="kids-animal-card"
            style="background: ${animal.color};"
            onclick="startAnimal('${animal.id}')">
-        <span class="card-emoji">${animal.emoji}</span>
+        ${thumbHTML}
         <div class="card-animal-name">${displayName}</div>
         <div class="card-desc">${displayDesc}</div>
         <div class="card-stars">${starsHtml}</div>

@@ -306,6 +306,38 @@ body.kids-page::after {
   transform: scale(1.1) rotate(-5deg);
 }
 
+/* 真实动物照片缩略图 */
+.card-photo-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  border: 3px solid rgba(255,255,255,0.7);
+  transition: transform 0.3s, box-shadow 0.3s;
+  flex-shrink: 0;
+}
+
+.kids-animal-card:hover .card-photo-wrap {
+  transform: scale(1.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.card-animal-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.card-emoji-fallback {
+  font-size: 80px;
+  line-height: 1;
+  display: block;
+}
+
 .card-animal-name {
   font-size: 24px;
   font-weight: 900;
@@ -593,6 +625,26 @@ body.kids-practice-page {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* 真实动物照片样式 */
+.animal-real-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border-radius: inherit;
+}
+
+.animal-photo-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  background: #f0f4f8;
 }
 
 /* Typing rows overlay - stacked vertically to fill card */
