@@ -31,8 +31,10 @@ class KidsPractice {
     this.buildUnifiedCard();
     this.updateProgressBadge();
     this.setupInput();
-    this.focusInput();
-    this.startTimer();  // 开始计时
+    // Do NOT auto-focus on load for kids; show tap-to-start hint.
+    // Timer starts on first keypress.
+    this.updateTimer();
+    this.updateStats();
   }
 
   setupHeader() {
@@ -113,12 +115,13 @@ class KidsPractice {
   updateProgressBadge() {
     const done = this.lineCompleted.filter(Boolean).length;
     const total = this.animal.lines.length;
-    const badge = document.getElementById('practiceProgressBadge');
-    if (badge) badge.textContent = `⭐ ${done} / ${total}`;
+    const progEl = document.getElementById('progressValue');
+    if (progEl) progEl.textContent = `${done}/${total}`;
   }
 
   // ============ Timer & Stats ============
   startTimer() {
+    if (this.timerInterval) return;
     this.startTime = Date.now();
     this.timerInterval = setInterval(() => {
       this.updateTimer();
@@ -136,24 +139,37 @@ class KidsPractice {
   }
 
   updateStats() {
-    if (!this.isStarted || !this.startTime) return;
+    // Progress always updates
+    const done = this.lineCompleted.filter(Boolean).length;
+    const total = this.animal?.lines?.length || 0;
+    const progEl = document.getElementById('progressValue');
+    if (progEl) progEl.textContent = `${done}/${total}`;
 
-    // Time in minutes
-    const timeMinutes = (Date.now() - this.startTime) / 1000 / 60;
+    // Before starting: keep default stats visible
+    if (!this.isStarted || !this.startTime) {
+      const accEl = document.getElementById('accuracyValue');
+      if (accEl) accEl.textContent = '100%';
+      return;
+    }
 
-    // WPM (Words Per Minute): 5 chars = 1 word
-    const wordsTyped = this.totalCharsTyped / 5;
-    const wpm = timeMinutes > 0 ? Math.round(wordsTyped / timeMinutes) : 0;
+    // Kids-friendly (final) accuracy: count only CURRENT uncorrected mistakes
+    const completedChars = this.animal.lines
+      .slice(0, this.currentLineIndex)
+      .reduce((s, line) => s + line.length, 0);
 
-    // Accuracy
-    const accuracy = this.totalCharsTyped > 0
-      ? Math.round(((this.totalCharsTyped - this.totalErrors) / this.totalCharsTyped) * 100)
+    const target = this.animal.lines[this.currentLineIndex] || '';
+    const typed = this.userInput || '';
+    let wrongNow = 0;
+    for (let i = 0; i < typed.length; i++) {
+      if (typed[i] !== target[i]) wrongNow++;
+    }
+
+    const finalTyped = completedChars + typed.length;
+    const accuracy = finalTyped > 0
+      ? Math.round(((finalTyped - wrongNow) / finalTyped) * 100)
       : 100;
 
-    // Update display
-    const wpmEl = document.getElementById('wpmValue');
     const accEl = document.getElementById('accuracyValue');
-    if (wpmEl) wpmEl.textContent = wpm;
     if (accEl) accEl.textContent = `${accuracy}%`;
   }
 
@@ -166,11 +182,11 @@ class KidsPractice {
 
   getFinalStats() {
     const timeEl = document.getElementById('timerValue');
-    const wpmEl = document.getElementById('wpmValue');
+    const progEl = document.getElementById('progressValue');
     const accEl = document.getElementById('accuracyValue');
     return {
       time: timeEl ? timeEl.textContent : '0:00',
-      wpm: wpmEl ? wpmEl.textContent : '0',
+      progress: progEl ? progEl.textContent : '0/0',
       accuracy: accEl ? accEl.textContent : '100%'
     };
   }
@@ -186,9 +202,8 @@ class KidsPractice {
     const input = document.getElementById('kidsHiddenInput');
     const card = document.getElementById('unifiedCard');
 
-    // Click card → focus
+    // Click card → focus (avoid global click stealing focus)
     card.addEventListener('click', () => this.focusInput());
-    document.addEventListener('click', () => this.focusInput());
 
     /* Desktop keyboard: keydown */
     document.addEventListener('keydown', (e) => {
@@ -251,12 +266,16 @@ class KidsPractice {
     const target = this.animal.lines[this.currentLineIndex];
     if (this.userInput.length >= target.length) return;
 
-    // Start timer on first char
+    // Start on first char (and start timer)
     if (!this.isStarted && this.currentLineIndex === 0 && this.userInput.length === 0) {
       this.isStarted = true;
+      this.startTimer();
+      // hide tap-to-start hint
+      const hint = document.getElementById('kidsStartHint');
+      if (hint) hint.classList.add('hide');
     }
 
-    // Check if correct before adding
+    // keystroke stats kept for potential future use
     const expectedChar = target[this.userInput.length];
     if (ch !== expectedChar) {
       this.totalErrors++;
@@ -393,8 +412,8 @@ class KidsPractice {
           <span class="stat-value">${stats.time}</span>
         </div>
         <div class="completion-stat-row">
-          <span class="stat-label">🚀 速度</span>
-          <span class="stat-value">${stats.wpm} WPM</span>
+          <span class="stat-label">⭐ 进度</span>
+          <span class="stat-value">${stats.progress}</span>
         </div>
         <div class="completion-stat-row">
           <span class="stat-label">✅ 准确率</span>
@@ -478,8 +497,13 @@ class KidsPractice {
 
     // Reset stats display
     document.getElementById('timerValue').textContent = '0:00';
-    document.getElementById('wpmValue').textContent = '0';
+    const progEl = document.getElementById('progressValue');
+    if (progEl) progEl.textContent = `0/${this.animal.lines.length}`;
     document.getElementById('accuracyValue').textContent = '100%';
+
+    // Show hint again
+    const hint = document.getElementById('kidsStartHint');
+    if (hint) hint.classList.remove('hide');
 
     // Rebuild
     this.buildUnifiedCard();

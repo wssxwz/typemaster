@@ -27,8 +27,8 @@
         <span class="mini-stat-value" id="timerValue">0:00</span>
       </div>
       <div class="mini-stat">
-        <span class="mini-stat-icon">🚀</span>
-        <span class="mini-stat-value" id="wpmValue">0</span>
+        <span class="mini-stat-icon">⭐</span>
+        <span class="mini-stat-value" id="progressValue">0/0</span>
       </div>
       <div class="mini-stat">
         <span class="mini-stat-icon">✅</span>
@@ -45,6 +45,11 @@
 
       <!-- SVG animal image (clipped to animal shape) -->
       <div class="animal-bg-layer" id="animalBgLayer"></div>
+
+      <!-- Tap-to-start hint (hidden after first keypress) -->
+      <div class="kids-start-hint" id="kidsStartHint">
+        点击这里开始打字 ✨
+      </div>
 
       <!-- Typing rows overlay — one per line, stacked vertically to fill the card -->
       <div class="typing-rows-overlay" id="typingRowsOverlay">
@@ -90,8 +95,8 @@
           <span class="stat-value">0:00</span>
         </div>
         <div class="completion-stat-row">
-          <span class="stat-label">🚀 速度</span>
-          <span class="stat-value">0 WPM</span>
+          <span class="stat-label">⭐ 进度</span>
+          <span class="stat-value">0/0</span>
         </div>
         <div class="completion-stat-row">
           <span class="stat-label">✅ 准确率</span>

@@ -19,6 +19,35 @@
 }
 
 /* ============================================
+   KIDS PRACTICE PAGE
+   ============================================ */
+
+.kids-start-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  padding: 14px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #3d2b1f;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+  border: 2px solid rgba(255,107,157,0.35);
+  user-select: none;
+  backdrop-filter: blur(6px);
+  animation: kidsHintPulse 1.2s ease-in-out infinite;
+}
+.kids-start-hint.hide { display: none; }
+
+@keyframes kidsHintPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.04); }
+}
+
+/* ============================================
    KIDS HOME PAGE
    ============================================ */
 
