@@ -29,6 +29,14 @@ class KidsPractice {
 
     this.setupHeader();
     this.buildUnifiedCard();
+    // Keep photo hidden until first correct line is completed
+    const card = document.getElementById('unifiedCard');
+    if (card) {
+      card.classList.add('bg-hidden');
+      // ensure start hint stays above bands
+      const hint = document.getElementById('kidsStartHint');
+      if (hint) hint.classList.remove('hide');
+    }
     this.updateProgressBadge();
     this.setupInput();
     // Do NOT auto-focus on load for kids; show tap-to-start hint.
@@ -59,7 +67,8 @@ class KidsPractice {
     // Calculate band height: each band = 100% / N of card height
     // Card aspect ratio: we want card to be roughly square-ish,
     // with each row tall enough to type comfortably (~70-90px min for wrapped text)
-    const rowHeightPx = Math.max(72, Math.min(100, Math.floor((window.innerHeight - 180) / N)));
+    // Slightly larger bands for kids eye comfort
+    const rowHeightPx = Math.max(86, Math.min(120, Math.floor((window.innerHeight - 160) / N)));
     const cardHeightPx = rowHeightPx * N;
 
     card.style.height = cardHeightPx + 'px';
@@ -308,15 +317,17 @@ class KidsPractice {
     const idx = this.currentLineIndex;
     this.lineCompleted[idx] = true;
 
-    // Update band: completed (transparent, image shows through)
+    // Update band: completed (direct reveal, no mid-mask animation)
     const band = document.getElementById(`band-${idx}`);
     if (band) {
-      band.classList.remove('active', 'locked');
-      band.classList.add('unlocking');
-      setTimeout(() => {
-        band.classList.remove('unlocking');
-        band.classList.add('completed');
-      }, 560);
+      band.classList.remove('active', 'locked', 'unlocking');
+      band.classList.add('completed');
+    }
+
+    // After first line completed, show photo (still hidden behind active grey band)
+    if (idx === 0) {
+      const card = document.getElementById('unifiedCard');
+      if (card) card.classList.remove('bg-hidden');
     }
 
     // Pill → check
@@ -507,6 +518,8 @@ class KidsPractice {
 
     // Rebuild
     this.buildUnifiedCard();
+    const card = document.getElementById('unifiedCard');
+    if (card) card.classList.add('bg-hidden');
     this.updateProgressBadge();
 
     // Clear log
