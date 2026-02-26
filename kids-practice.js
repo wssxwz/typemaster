@@ -22,6 +22,7 @@ class KidsPractice {
     // Kids mode & sound
     this.mode = localStorage.getItem('kidsMode') || 'explore';
     this.soundOn = (localStorage.getItem('kidsSound') ?? 'on') === 'on';
+    this.fingerOn = (localStorage.getItem('kidsFingerGuide') ?? (this.mode === 'create' ? 'on' : 'off')) === 'on';
 
     // Key repeat / long-press guard
     this.lastKeyAt = 0;
@@ -40,6 +41,12 @@ class KidsPractice {
     // Ensure start hint is visible on entry
     const hint = document.getElementById('kidsStartHint');
     if (hint) hint.classList.remove('hide');
+
+    // Finger guide UI (create mode default on)
+    if (this.mode !== 'create' && localStorage.getItem('kidsFingerGuide') == null) {
+      this.fingerOn = false;
+    }
+    this.setupFingerGuide();
 
     // Sound toggle UI
     const btn = document.getElementById('kidsSoundBtn');
@@ -316,6 +323,71 @@ class KidsPractice {
     } catch (_) {}
   }
 
+  setupFingerGuide() {
+    const wrap = document.getElementById('kidsFingerGuide');
+    if (!wrap) return;
+
+    // Render simple 10-finger strip (L5..L1 R1..R5)
+    wrap.innerHTML = `
+      <div class="finger-strip" id="fingerStrip">
+        ${['L5','L4','L3','L2','L1','R1','R2','R3','R4','R5'].map(k =>
+          `<div class="finger-dot small" data-finger="${k}">${k}</div>`
+        ).join('')}
+      </div>
+      <div class="finger-legend">🖐️ 指法引导：高亮 = 下一键建议手指</div>
+    `;
+
+    const btn = document.getElementById('kidsFingerBtn');
+    const paint = () => {
+      wrap.classList.toggle('show', this.fingerOn);
+      if (btn) btn.classList.toggle('off', !this.fingerOn);
+    };
+
+    // default visibility by mode
+    paint();
+
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.fingerOn = !this.fingerOn;
+        localStorage.setItem('kidsFingerGuide', this.fingerOn ? 'on' : 'off');
+        paint();
+      });
+    }
+
+    // update highlight once
+    this.updateFingerHighlight();
+  }
+
+  getFingerForChar(ch) {
+    const c = (ch || '').toLowerCase();
+    // Very lightweight mapping for letters (can be refined)
+    const map = {
+      'q':'L5','a':'L5','z':'L5',
+      'w':'L4','s':'L4','x':'L4',
+      'e':'L3','d':'L3','c':'L3',
+      'r':'L2','f':'L2','v':'L2','t':'L2','g':'L2','b':'L2',
+      'y':'R2','h':'R2','n':'R2','u':'R2','j':'R2','m':'R2',
+      'i':'R3','k':'R3',',':'R3',
+      'o':'R4','l':'R4','.':'R4',
+      'p':'R5',';':'R5','/':'R5'
+    };
+    return map[c] || null;
+  }
+
+  updateFingerHighlight() {
+    if (!this.fingerOn) return;
+    const wrap = document.getElementById('kidsFingerGuide');
+    if (!wrap) return;
+    const target = this.animal?.lines?.[this.currentLineIndex] || '';
+    const next = target[this.userInput.length] || '';
+    const finger = this.getFingerForChar(next);
+
+    wrap.querySelectorAll('.finger-dot').forEach(el => {
+      el.classList.toggle('on', finger && el.dataset.finger === finger);
+    });
+  }
+
   handleChar(ch) {
     if (this.currentLineIndex >= this.animal.lines.length) return;
     const target = this.animal.lines[this.currentLineIndex];
@@ -328,11 +400,17 @@ class KidsPractice {
       // hide tap-to-start hint
       const hint = document.getElementById('kidsStartHint');
       if (hint) hint.classList.add('hide');
+      // ensure finger guide visibility matches mode
+      if (this.mode !== 'create') {
+        // explore mode default: hide guide unless user explicitly turned it on
+        // (keep current this.fingerOn state)
+      }
     }
 
     // keystroke stats kept for potential future use
     const expectedChar = target[this.userInput.length];
     const isCorrect = ch === expectedChar;
+    // keep finger guide in create mode only by default
     if (!isCorrect) {
       this.totalErrors++;
     }
@@ -340,6 +418,7 @@ class KidsPractice {
     this.userInput += ch;
     this.totalCharsTyped++;
     this.refreshBandChars(this.currentLineIndex);
+    this.updateFingerHighlight();
 
     // hit feedback (non-blocking)
     const pos = this.userInput.length - 1;
@@ -367,6 +446,7 @@ class KidsPractice {
     if (this.userInput.length === 0) return;
     this.userInput = this.userInput.slice(0, -1);
     this.refreshBandChars(this.currentLineIndex);
+    this.updateFingerHighlight();
   }
 
   refreshBandChars(lineIndex) {
@@ -427,6 +507,7 @@ class KidsPractice {
         const nextPill = document.getElementById(`pill-${next}`);
         if (nextPill) nextPill.textContent = '✏️';
         this.refreshBandChars(next);
+        this.updateFingerHighlight();
         nextBand.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
@@ -590,6 +671,7 @@ class KidsPractice {
     const card = document.getElementById('unifiedCard');
     if (card) card.classList.remove('bg-ready');
     this.updateProgressBadge();
+    this.updateFingerHighlight();
 
     // Clear log
     const list = document.getElementById('completedLogList');

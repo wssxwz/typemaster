@@ -254,8 +254,35 @@ function listenForCompletion() {
   });
 }
 
+function setupModeTabs() {
+  const tabs = document.getElementById('kidsModeTabs');
+  const desc = document.getElementById('kidsModeDesc');
+  if (!tabs) return;
+
+  const MODE_TEXT = {
+    explore: '探索模式：颜色定位 + 发音跟读 + 轻松练习',
+    create:  '创作模式：指法引导 + Prompt 关卡 + 盲打初探'
+  };
+
+  const cur = localStorage.getItem('kidsMode') || 'explore';
+  tabs.querySelectorAll('.kids-mode-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === cur);
+  });
+  if (desc) desc.textContent = MODE_TEXT[cur] || '';
+
+  tabs.querySelectorAll('.kids-mode-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const m = btn.dataset.mode;
+      localStorage.setItem('kidsMode', m);
+      tabs.querySelectorAll('.kids-mode-tab').forEach(b => b.classList.toggle('active', b === btn));
+      if (desc) desc.textContent = MODE_TEXT[m] || '';
+    });
+  });
+}
+
 // ============ Init ============
 document.addEventListener('DOMContentLoaded', () => {
+  setupModeTabs();
   TreeSystem.render('treeContainer');
   updateTreeStats();
   renderAnimalCards();
