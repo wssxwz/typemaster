@@ -29,14 +29,9 @@ class KidsPractice {
 
     this.setupHeader();
     this.buildUnifiedCard();
-    // Keep photo hidden until first correct line is completed
-    const card = document.getElementById('unifiedCard');
-    if (card) {
-      card.classList.add('bg-hidden');
-      // ensure start hint stays above bands
-      const hint = document.getElementById('kidsStartHint');
-      if (hint) hint.classList.remove('hide');
-    }
+    // Ensure start hint is visible on entry
+    const hint = document.getElementById('kidsStartHint');
+    if (hint) hint.classList.remove('hide');
     this.updateProgressBadge();
     this.setupInput();
     // Do NOT auto-focus on load for kids; show tap-to-start hint.
@@ -327,7 +322,7 @@ class KidsPractice {
     // After first line completed, show photo (still hidden behind active grey band)
     if (idx === 0) {
       const card = document.getElementById('unifiedCard');
-      if (card) card.classList.remove('bg-hidden');
+      if (card) card.classList.add('bg-ready');
     }
 
     // Pill → check
@@ -519,7 +514,7 @@ class KidsPractice {
     // Rebuild
     this.buildUnifiedCard();
     const card = document.getElementById('unifiedCard');
-    if (card) card.classList.add('bg-hidden');
+    if (card) card.classList.remove('bg-ready');
     this.updateProgressBadge();
 
     // Clear log
