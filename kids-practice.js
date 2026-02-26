@@ -19,6 +19,14 @@ class KidsPractice {
     this.totalCharsTyped = 0;
     this.totalErrors = 0;
 
+    // Kids mode & sound
+    this.mode = localStorage.getItem('kidsMode') || 'explore';
+    this.soundOn = (localStorage.getItem('kidsSound') ?? 'on') === 'on';
+
+    // Key repeat / long-press guard
+    this.lastKeyAt = 0;
+    this.minKeyIntervalMs = 45;
+
     this.init();
   }
 
@@ -32,6 +40,23 @@ class KidsPractice {
     // Ensure start hint is visible on entry
     const hint = document.getElementById('kidsStartHint');
     if (hint) hint.classList.remove('hide');
+
+    // Sound toggle UI
+    const btn = document.getElementById('kidsSoundBtn');
+    if (btn) {
+      const paint = () => {
+        btn.textContent = this.soundOn ? '🔊' : '🔇';
+        btn.classList.toggle('off', !this.soundOn);
+      };
+      paint();
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.soundOn = !this.soundOn;
+        localStorage.setItem('kidsSound', this.soundOn ? 'on' : 'off');
+        paint();
+        if (this.soundOn) this.speak('sound on', 1.0, 1.0);
+      });
+    }
     this.updateProgressBadge();
     this.setupInput();
     // Do NOT auto-focus on load for kids; show tap-to-start hint.
@@ -112,7 +137,7 @@ class KidsPractice {
         cls += ' k-current';
       }
       const display = ch === ' ' ? '&nbsp;' : ch;
-      return `<span class="${cls}">${display}</span>`;
+      return `<span class="${cls}" data-i="${i}" data-line="${lineIndex}">${display}</span>`;
     }).join('');
   }
 
@@ -217,6 +242,12 @@ class KidsPractice {
       const overlay = document.getElementById('kidsCompletionOverlay');
       if (overlay.classList.contains('show')) return;
 
+      // long-press guard
+      if (e.repeat) return;
+      const now = Date.now();
+      if (now - this.lastKeyAt < this.minKeyIntervalMs) return;
+      this.lastKeyAt = now;
+
       if (e.key === 'Backspace') {
         e.preventDefault();
         this.handleBackspace();
@@ -247,6 +278,12 @@ class KidsPractice {
       const val = input.value;
       input.value = ''; // Clear immediately to prevent accumulation
       if (!val) return;
+
+      // basic throttle for mobile long-press
+      const now = Date.now();
+      if (now - this.lastKeyAt < this.minKeyIntervalMs) return;
+      this.lastKeyAt = now;
+
       for (const ch of val) {
         if (ch === '\b') {
           this.handleBackspace();
@@ -265,6 +302,20 @@ class KidsPractice {
     input.setSelectionRange(0, 0);
   }
 
+  speak(text, rate=0.95, pitch=1.15) {
+    try {
+      if (!this.soundOn) return;
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = rate;
+      u.pitch = pitch;
+      // keep it short & interruptible
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+
   handleChar(ch) {
     if (this.currentLineIndex >= this.animal.lines.length) return;
     const target = this.animal.lines[this.currentLineIndex];
@@ -281,13 +332,29 @@ class KidsPractice {
 
     // keystroke stats kept for potential future use
     const expectedChar = target[this.userInput.length];
-    if (ch !== expectedChar) {
+    const isCorrect = ch === expectedChar;
+    if (!isCorrect) {
       this.totalErrors++;
     }
 
     this.userInput += ch;
     this.totalCharsTyped++;
     this.refreshBandChars(this.currentLineIndex);
+
+    // hit feedback (non-blocking)
+    const pos = this.userInput.length - 1;
+    const el = document.querySelector(`#chars-${this.currentLineIndex} .k-char[data-i="${pos}"]`);
+    if (el) {
+      el.classList.add(isCorrect ? 'hit-correct' : 'hit-wrong');
+      setTimeout(() => el.classList.remove('hit-correct', 'hit-wrong'), 240);
+    }
+
+    // phonics: speak on correct hit in explore mode
+    if (this.mode === 'explore' && isCorrect) {
+      const say = expectedChar === ' ' ? 'space' : expectedChar;
+      this.speak(say);
+    }
+
     this.updateStats();
 
     // Check line completion
@@ -333,7 +400,14 @@ class KidsPractice {
     this.showSparkle(band);
 
     // Add to completed log
-    this.addToLog(idx, this.animal.lines[idx]);
+    const lineText = this.animal.lines[idx];
+    this.addToLog(idx, lineText);
+
+    // Speak full word/line after completion (explore mode)
+    if (this.mode === 'explore') {
+      const phrase = (lineText || '').trim();
+      if (phrase) this.speak(phrase, 0.9, 1.05);
+    }
 
     // Update progress badge
     this.updateProgressBadge();
