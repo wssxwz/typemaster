@@ -184,7 +184,6 @@ function renderAnimalCards() {
         <div class="card-desc">${displayDesc}</div>
         <div class="card-meta-row">
           <div class="card-stars">${starsHtml}</div>
-          <div class="card-chip">${isEn ? 'EN' : '中文'}</div>
         </div>
         <button class="card-start-btn">${btnText}</button>
       </div>
