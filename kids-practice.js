@@ -34,10 +34,21 @@ class KidsPractice {
   init() {
     const animalId = localStorage.getItem('kidsAnimalId') || 'panda';
     this.animal = kidsAnimals.find(a => a.id === animalId) || kidsAnimals[0];
-    this.lineCompleted = new Array(this.animal.lines.length).fill(false);
+
+    // Lines source depends on mode
+    if (this.mode === 'create') {
+      this.lesson = this.getCreateLesson(this.animal);
+      this.lines = this.lesson.lines;
+    } else {
+      this.lesson = null;
+      this.lines = this.animal.lines;
+    }
+
+    this.lineCompleted = new Array(this.lines.length).fill(false);
 
     this.setupHeader();
     this.buildUnifiedCard();
+    this.setupCreateStage();
     // Ensure start hint is visible on entry
     const hint = document.getElementById('kidsStartHint');
     if (hint) hint.classList.remove('hide');
@@ -73,10 +84,18 @@ class KidsPractice {
   }
 
   setupHeader() {
-    document.getElementById('practiceAnimalEmoji').textContent = this.animal.emoji;
-    document.getElementById('practiceAnimalName').textContent =
-      `${this.animal.name} · ${this.animal.nameEn}`;
-    document.title = `TypeKids - ${this.animal.name}`;
+    const titleEl = document.getElementById('practiceAnimalEmoji');
+    const nameEl  = document.getElementById('practiceAnimalName');
+    if (this.mode === 'create' && this.lesson) {
+      // Create mode: show magic wand + lesson title
+      if (titleEl) titleEl.textContent = '🪄';
+      if (nameEl) nameEl.textContent = `创作模式 · ${this.lesson.title}`;
+      document.title = `TypeKids - Create - ${this.lesson.title}`;
+    } else {
+      if (titleEl) titleEl.textContent = this.animal.emoji;
+      if (nameEl) nameEl.textContent = `${this.animal.name} · ${this.animal.nameEn}`;
+      document.title = `TypeKids - ${this.animal.name}`;
+    }
   }
 
   /* ----------------------------------------------------------
@@ -89,7 +108,7 @@ class KidsPractice {
     const bgLayer = document.getElementById('animalBgLayer');
     const overlay = document.getElementById('typingRowsOverlay');
 
-    const N = this.animal.lines.length;
+    const N = this.lines.length;
 
     // Calculate band height: each band = 100% / N of card height
     // Card aspect ratio: we want card to be roughly square-ish,
@@ -135,7 +154,7 @@ class KidsPractice {
   }
 
   buildCharsHTML(lineIndex, typedSoFar) {
-    const target = this.animal.lines[lineIndex];
+    const target = this.lines[lineIndex];
     return target.split('').map((ch, i) => {
       let cls = 'k-char';
       if (i < typedSoFar.length) {
@@ -150,9 +169,125 @@ class KidsPractice {
 
   updateProgressBadge() {
     const done = this.lineCompleted.filter(Boolean).length;
-    const total = this.animal.lines.length;
+    const total = this.lines.length;
     const progEl = document.getElementById('progressValue');
     if (progEl) progEl.textContent = `${done}/${total}`;
+
+    // Create mode: keep the stage caption in sync
+    if (this.mode === 'create') {
+      this.updateCreateCaption();
+    }
+  }
+
+  getCreateLesson(animal) {
+    // Minimal V1.0 create lesson: 3-step prompt building
+    // (subject -> action -> scene)
+    const title = 'AI 魔法指令：小机器人';
+    return {
+      id: 'robot_prompt',
+      title,
+      emoji: '🤖',
+      lines: [
+        'A cool robot',
+        'is dancing',
+        'on the moon'
+      ]
+    };
+  }
+
+  setupCreateStage() {
+    const stage = document.getElementById('kidsCreateStage');
+    const bgLayer = document.getElementById('animalBgLayer');
+    const card = document.getElementById('unifiedCard');
+    if (!stage || !card) return;
+
+    if (this.mode !== 'create') {
+      stage.classList.remove('show');
+      stage.innerHTML = '';
+      // explore mode uses animal bg reveal
+      if (bgLayer) {
+        // keep photo hidden until first line is completed
+        bgLayer.style.display = '';
+      }
+      card.classList.remove('bg-ready');
+      return;
+    }
+
+    // Create mode: show stage and hide animal photo
+    stage.classList.add('show');
+    if (bgLayer) {
+      bgLayer.style.display = 'none';
+    }
+
+    stage.innerHTML = `
+      <div class="create-stage-bg" id="createStageBg"></div>
+      <div class="moon-stars" id="moonStars"></div>
+      <div class="create-stage-caption" id="createStageCaption">输入第1行：主语（谁/什么）</div>
+      <div class="create-stage-center">
+        <div class="robot-outline" id="robotOutline">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="55" y="40" width="90" height="80" rx="16" fill="none" stroke="#4b5563" stroke-width="6"/>
+            <circle cx="85" cy="75" r="9" fill="#4b5563"/>
+            <circle cx="115" cy="75" r="9" fill="#4b5563"/>
+            <rect x="85" y="95" width="30" height="10" rx="5" fill="#4b5563" opacity="0.8"/>
+            <rect x="70" y="120" width="60" height="55" rx="14" fill="none" stroke="#4b5563" stroke-width="6"/>
+            <line x1="70" y1="140" x2="40" y2="160" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+            <line x1="130" y1="140" x2="160" y2="160" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+            <line x1="85" y1="175" x2="75" y2="195" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+            <line x1="115" y1="175" x2="125" y2="195" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="robot-dance" id="robotDance"></div>
+      </div>
+    `;
+
+    // reset stage state
+    this.updateCreateStageForStep(-1);
+  }
+
+  updateCreateCaption() {
+    const cap = document.getElementById('createStageCaption');
+    if (!cap) return;
+    const step = this.currentLineIndex;
+    const text = step === 0
+      ? '输入第1行：主语（谁/什么）'
+      : step === 1
+        ? '输入第2行：动作（在做什么）'
+        : step === 2
+          ? '输入第3行：场景（在哪里）'
+          : '完成啦！';
+    cap.textContent = text;
+  }
+
+  updateCreateStageForStep(stepCompleted) {
+    // stepCompleted: 0->subject, 1->action, 2->scene
+    const outline = document.getElementById('robotOutline');
+    const dance = document.getElementById('robotDance');
+    const bg = document.getElementById('createStageBg');
+    const stars = document.getElementById('moonStars');
+
+    if (!outline || !bg || !stars) return;
+
+    if (stepCompleted >= 0) {
+      outline.classList.add('show');
+    }
+
+    if (stepCompleted >= 1) {
+      // turn on dance
+      if (dance) {
+        dance.classList.add('show', 'dancing');
+      }
+      outline.classList.add('show');
+      outline.style.filter = 'drop-shadow(0 10px 18px rgba(0,0,0,0.12))';
+    }
+
+    if (stepCompleted >= 2) {
+      bg.classList.add('moon');
+      stars.classList.add('show');
+    } else {
+      bg.classList.remove('moon');
+      stars.classList.remove('show');
+    }
   }
 
   // ============ Timer & Stats ============
@@ -177,7 +312,7 @@ class KidsPractice {
   updateStats() {
     // Progress always updates
     const done = this.lineCompleted.filter(Boolean).length;
-    const total = this.animal?.lines?.length || 0;
+    const total = this.lines?.length || 0;
     const progEl = document.getElementById('progressValue');
     if (progEl) progEl.textContent = `${done}/${total}`;
 
@@ -189,11 +324,11 @@ class KidsPractice {
     }
 
     // Kids-friendly (final) accuracy: count only CURRENT uncorrected mistakes
-    const completedChars = this.animal.lines
+    const completedChars = this.lines
       .slice(0, this.currentLineIndex)
       .reduce((s, line) => s + line.length, 0);
 
-    const target = this.animal.lines[this.currentLineIndex] || '';
+    const target = this.lines[this.currentLineIndex] || '';
     const typed = this.userInput || '';
     let wrongNow = 0;
     for (let i = 0; i < typed.length; i++) {
@@ -379,7 +514,7 @@ class KidsPractice {
     if (!this.fingerOn) return;
     const wrap = document.getElementById('kidsFingerGuide');
     if (!wrap) return;
-    const target = this.animal?.lines?.[this.currentLineIndex] || '';
+    const target = this.lines?.[this.currentLineIndex] || '';
     const next = target[this.userInput.length] || '';
     const finger = this.getFingerForChar(next);
 
@@ -389,8 +524,8 @@ class KidsPractice {
   }
 
   handleChar(ch) {
-    if (this.currentLineIndex >= this.animal.lines.length) return;
-    const target = this.animal.lines[this.currentLineIndex];
+    if (this.currentLineIndex >= this.lines.length) return;
+    const target = this.lines[this.currentLineIndex];
     if (this.userInput.length >= target.length) return;
 
     // Start on first char (and start timer)
@@ -466,10 +601,14 @@ class KidsPractice {
       band.classList.add('completed');
     }
 
-    // After first line completed, show photo (still hidden behind active grey band)
-    if (idx === 0) {
+    // Explore mode: after first line completed, show photo.
+    // Create mode: update stage by step completion.
+    if (this.mode !== 'create' && idx === 0) {
       const card = document.getElementById('unifiedCard');
       if (card) card.classList.add('bg-ready');
+    }
+    if (this.mode === 'create') {
+      this.updateCreateStageForStep(idx);
     }
 
     // Pill → check
@@ -480,7 +619,7 @@ class KidsPractice {
     this.showSparkle(band);
 
     // Add to completed log
-    const lineText = this.animal.lines[idx];
+    const lineText = this.lines[idx];
     this.addToLog(idx, lineText);
 
     // Speak full word/line after completion (explore mode)
@@ -494,7 +633,7 @@ class KidsPractice {
 
     // Move to next line
     const next = idx + 1;
-    if (next >= this.animal.lines.length) {
+    if (next >= this.lines.length) {
       setTimeout(() => this.showCompletion(), 700);
     } else {
       this.currentLineIndex = next;
@@ -552,7 +691,7 @@ class KidsPractice {
     this.stopTimer();
 
     // 计算总字数
-    const totalChars = this.animal.lines.reduce((sum, line) => sum + line.length, 0);
+    const totalChars = this.lines.reduce((sum, line) => sum + line.length, 0);
 
     // 保存到 sessionStorage，首页会读取
     sessionStorage.setItem('kidsCompleted', totalChars.toString());
@@ -562,7 +701,9 @@ class KidsPractice {
 
     document.getElementById('completionAnimalEmoji').textContent = this.animal.emoji;
     document.getElementById('completionSubtitle').textContent =
-      `你解锁了完整的 ${this.animal.name}！`;
+      this.mode === 'create'
+        ? `你完成了创作指令：${this.lesson?.title || 'Prompt'}！`
+        : `你解锁了完整的 ${this.animal.name}！`;
 
     // 显示最终统计
     const finalStatsEl = document.getElementById('completionFinalStats');
@@ -650,7 +791,7 @@ class KidsPractice {
     // Reset state
     this.currentLineIndex = 0;
     this.userInput = '';
-    this.lineCompleted = new Array(this.animal.lines.length).fill(false);
+    this.lineCompleted = new Array(this.lines.length).fill(false);
     this.isStarted = false;
     this.totalCharsTyped = 0;
     this.totalErrors = 0;
@@ -659,7 +800,7 @@ class KidsPractice {
     // Reset stats display
     document.getElementById('timerValue').textContent = '0:00';
     const progEl = document.getElementById('progressValue');
-    if (progEl) progEl.textContent = `0/${this.animal.lines.length}`;
+    if (progEl) progEl.textContent = `0/${this.lines.length}`;
     document.getElementById('accuracyValue').textContent = '100%';
 
     // Show hint again
@@ -676,6 +817,9 @@ class KidsPractice {
     // Clear log
     const list = document.getElementById('completedLogList');
     list.innerHTML = '<span class="completed-log-empty">打对一行就会出现在这里～</span>';
+
+    // Reset create stage
+    this.setupCreateStage();
 
     // Restart timer
     this.startTimer();
