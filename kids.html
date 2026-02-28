@@ -32,30 +32,28 @@
         <p class="kids-hero-sub">选一只小动物，开始打字冒险吧！</p>
       </div>
     </div>
+  </section>
+
+  <!-- Controls (compact, centered) -->
+  <section class="kids-controls">
     <div class="tree-stats" id="treeStats" onclick="window.location.href='kids-checkin.html'" role="button" tabindex="0" title="查看打卡详情">
-      <span>📊 总字数：<strong id="totalChars">0</strong></span>
-      <span>📅 今天：<strong id="todayChars">0</strong></span>
-      <span>🌱 树龄：<strong id="treeDays">0</strong> 天</span>
+      <span>📊 总：<strong id="totalChars">0</strong></span>
+      <span>📅 今：<strong id="todayChars">0</strong></span>
+      <span>🌱 <strong id="treeDays">0</strong>天</span>
       <span class="tree-stats-arrow">›</span>
     </div>
-    <div class="stars-row">⭐ ⭐ ⭐ ⭐ ⭐</div>
-  </section>
 
-  <!-- Mode Switch (Explore/Create) -->
-  <section class="kids-mode-section">
     <div class="kids-mode-tabs" id="kidsModeTabs">
-      <button class="kids-mode-tab active" data-mode="explore">🔎 探索模式 (3-6)</button>
-      <button class="kids-mode-tab" data-mode="create">🪄 创作模式 (7-10)</button>
+      <button class="kids-mode-tab active" data-mode="explore">🔎 探索 (3-6)</button>
+      <button class="kids-mode-tab" data-mode="create">🪄 创作 (7-10)</button>
     </div>
-    <div class="kids-mode-desc" id="kidsModeDesc">探索模式：颜色定位 + 发音跟读 + 轻松练习</div>
-  </section>
 
-  <!-- Language Filter -->
-  <section class="filter-section">
     <div class="filter-tabs">
       <button class="filter-tab active" data-lang="english">🇬🇧 English</button>
       <button class="filter-tab" data-lang="chinese">🇨🇳 中文</button>
     </div>
+
+    <div class="kids-mode-desc" id="kidsModeDesc">探索模式：颜色定位 + 发音跟读 + 轻松练习</div>
   </section>
 
   <!-- Animal Cards Grid -->

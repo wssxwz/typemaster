@@ -210,7 +210,6 @@ body.kids-page::after {
   padding: 10px 14px;
   border-radius: 999px;
   background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.06);
   box-shadow: 0 4px 14px rgba(17,24,39,0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -281,7 +280,6 @@ body.kids-page::after {
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: 0 6px 18px rgba(17,24,39,0.06);
-  border: 1px solid rgba(0,0,0,0.06);
   user-select: none;
   text-decoration: none;
 }
@@ -355,11 +353,51 @@ body.kids-page::after {
   font-size: 24px;
 }
 
+
+
+/* ============================================
+   KIDS CONTROLS (compact stack)
+   ============================================ */
+
+.kids-controls {
+  max-width: 760px;
+  margin: -6px auto 10px;
+  padding: 0 16px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.kids-controls .tree-stats {
+  margin: 0;
+  width: 100%;
+  max-width: 520px;
+}
+
+.kids-controls .kids-mode-tabs,
+.kids-controls .filter-tabs {
+  width: 100%;
+  max-width: 520px;
+}
+
+.kids-controls .kids-mode-desc {
+  margin-top: 0;
+  max-width: 520px;
+}
+
+@media (min-width: 820px) {
+  .kids-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---- Animal Grid ---- */
 .kids-grid-section {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 20px 60px;
+  padding: 0 20px 44px;
   position: relative;
   z-index: 1;
 }
@@ -369,7 +407,7 @@ body.kids-page::after {
   font-size: 22px;
   color: #aaa;
   font-weight: 700;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
   letter-spacing: 1px;
 }
 
