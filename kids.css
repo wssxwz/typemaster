@@ -223,6 +223,7 @@ body.kids-page::after {
   display:flex;
   align-items:center;
   gap:10px;
+  margin-left: auto;
 }
 
 .kids-lang-select {
@@ -1495,3 +1496,36 @@ body.kids-practice-page {
 
 
 .stars-row{display:none;}
+
+
+/* Flat animal cards: white base + accent tag */
+.kids-animal-card {
+  background: #ffffff !important;
+}
+
+.card-accent {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  height: 10px;
+  width: 44px;
+  border-radius: 999px;
+  opacity: 0.95;
+}
+
+.card-meta-row {
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.card-chip {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+  background: rgba(17,24,39,0.06);
+  padding: 6px 10px;
+  border-radius: 999px;
+}

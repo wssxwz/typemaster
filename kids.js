@@ -177,13 +177,15 @@ function renderAnimalCards() {
       : animal.description;
     const btnText = isEn ? 'Start →' : '开始练习 →';
     return `
-      <div class="kids-animal-card"
-           style="background: ${animal.color};"
-           onclick="startAnimal('${animal.id}')">
+      <div class="kids-animal-card" onclick="startAnimal('${animal.id}')">
+        <span class="card-accent" style="background:${animal.color};"></span>
         <span class="card-emoji">${animal.emoji}</span>
         <div class="card-animal-name">${displayName}</div>
         <div class="card-desc">${displayDesc}</div>
-        <div class="card-stars">${starsHtml}</div>
+        <div class="card-meta-row">
+          <div class="card-stars">${starsHtml}</div>
+          <div class="card-chip">${isEn ? 'EN' : '中文'}</div>
+        </div>
         <button class="card-start-btn">${btnText}</button>
       </div>
     `;
