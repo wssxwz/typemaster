@@ -17,7 +17,18 @@
       </svg>
       返回 TypeMaster
     </a>
-    <div class="kids-nav-badge">🎮 幼儿版</div>
+    <div class="kids-nav-right">
+      <select class="kids-lang-select" id="kidsLangSelect" aria-label="Language">
+        <option value="english">🇬🇧 English</option>
+        <option value="chinese">🇨🇳 中文</option>
+      </select>
+      <div class="kids-nav-badge">🎮 幼儿版</div>
+      <div class="kids-hero-stats" id="kidsHeroStats" onclick="window.location.href='kids-checkin.html'" role="button" tabindex="0" title="查看打卡详情">
+        <div class="stat-item"><div class="stat-label">总字数</div><div class="stat-value" id="totalChars">0</div></div>
+        <div class="stat-item"><div class="stat-label">今天</div><div class="stat-value" id="todayChars">0</div></div>
+        <div class="stat-item"><div class="stat-label">树龄</div><div class="stat-value"><span id="treeDays">0</span><span class="stat-unit">天</span></div></div>
+      </div>
+    </div>
   </nav>
 
   <!-- Hero + Tree -->
@@ -31,32 +42,25 @@
         <h1 class="kids-hero-title">TypeKids</h1>
         <p class="kids-hero-sub">选一只小动物，开始打字冒险吧！</p>
       </div>
+      <div class="kids-hero-stats" id="kidsHeroStats" onclick="window.location.href='kids-checkin.html'" role="button" tabindex="0" title="查看打卡详情">
+        <div class="stat-item"><div class="stat-label">总字数</div><div class="stat-value" id="totalChars">0</div></div>
+        <div class="stat-item"><div class="stat-label">今天</div><div class="stat-value" id="todayChars">0</div></div>
+        <div class="stat-item"><div class="stat-label">树龄</div><div class="stat-value"><span id="treeDays">0</span><span class="stat-unit">天</span></div></div>
+      </div>
     </div>
   </section>
 
   <!-- Controls (compact, centered) -->
-  <section class="kids-controls">
-    <div class="tree-stats" id="treeStats" onclick="window.location.href='kids-checkin.html'" role="button" tabindex="0" title="查看打卡详情">
-      <span>📊 总：<strong id="totalChars">0</strong></span>
-      <span>📅 今：<strong id="todayChars">0</strong></span>
-      <span>🌱 <strong id="treeDays">0</strong>天</span>
-      <span class="tree-stats-arrow">›</span>
-    </div>
 
+  <!-- Mode Switch (Explore/Create) -->
+  <section class="kids-mode-section">
     <div class="kids-mode-tabs" id="kidsModeTabs">
       <button class="kids-mode-tab active" data-mode="explore">🔎 探索 (3-6)</button>
       <button class="kids-mode-tab" data-mode="create">🪄 创作 (7-10)</button>
     </div>
-
-    <div class="filter-tabs">
-      <button class="filter-tab active" data-lang="english">🇬🇧 English</button>
-      <button class="filter-tab" data-lang="chinese">🇨🇳 中文</button>
-    </div>
-
     <div class="kids-mode-desc" id="kidsModeDesc">探索模式：颜色定位 + 发音跟读 + 轻松练习</div>
   </section>
-
-  <!-- Animal Cards Grid -->
+<!-- Animal Cards Grid -->
   <section class="kids-grid-section">
     <p class="kids-grid-title">🎯 选择你的动物小伙伴</p>
     <div class="kids-animals-grid" id="kidsAnimalsGrid">

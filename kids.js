@@ -224,16 +224,20 @@ function updateTreeStats() {
 }
 
 // ============ 语言筛选 ============
-function setupFilterTabs() {
-  const tabs = document.querySelectorAll('.filter-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      tabs.forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      currentFilter = e.target.dataset.lang;
-      renderAnimalCards();
-      updateTreeStats();  // 更新统计标签文字
-    });
+function setupLanguageSelect() {
+  const sel = document.getElementById('kidsLangSelect');
+  if (!sel) return;
+
+  // init from localStorage
+  const cur = localStorage.getItem('kidsLang') || currentFilter || 'english';
+  currentFilter = cur;
+  sel.value = cur;
+
+  sel.addEventListener('change', (e) => {
+    currentFilter = e.target.value;
+    localStorage.setItem('kidsLang', currentFilter);
+    renderAnimalCards();
+    updateTreeStats();
   });
 }
 
@@ -286,6 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
   TreeSystem.render('treeContainer');
   updateTreeStats();
   renderAnimalCards();
-  setupFilterTabs();
+  setupLanguageSelect();
   listenForCompletion();
 });
