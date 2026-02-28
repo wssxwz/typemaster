@@ -156,21 +156,23 @@
    ============================================ */
 
 body.kids-page {
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', -apple-system, sans-serif;
-  background: linear-gradient(135deg, #fff9f0 0%, #ffeef8 50%, #eef9ff 100%);
+  /* Modern flat + friendly rounded system font */
+  font-family: ui-rounded, -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Segoe UI', Roboto, Arial, sans-serif;
+  background: #f6f7fb;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Floating decorations */
+/* Subtle flat blobs (lighter, less "old" gradients) */
 body.kids-page::before {
   content: '';
   position: fixed;
-  top: -100px;
-  right: -100px;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255,107,157,0.15) 0%, transparent 70%);
+  inset: auto;
+  top: -120px;
+  right: -140px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255,107,157,0.10) 0%, rgba(255,107,157,0.00) 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -178,11 +180,11 @@ body.kids-page::before {
 body.kids-page::after {
   content: '';
   position: fixed;
-  bottom: -100px;
-  left: -100px;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(107,203,119,0.15) 0%, transparent 70%);
+  bottom: -140px;
+  left: -140px;
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(79,70,229,0.08) 0%, rgba(79,70,229,0.00) 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -201,30 +203,31 @@ body.kids-page::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #888;
+  color: #6b7280;
   text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 50px;
-  background: rgba(255,255,255,0.8);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 14px rgba(17,24,39,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .kids-back-link:hover {
-  background: white;
-  color: #555;
-  transform: translateX(-3px);
+  box-shadow: 0 6px 18px rgba(17,24,39,0.09);
+  transform: translateY(-1px);
 }
 
 .kids-nav-badge {
-  font-size: 13px;
-  background: linear-gradient(135deg, #ff6b9d, #ffd93d);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 50px;
-  font-weight: 700;
+  font-size: 12px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
 }
 
 /* ---- Hero ---- */
@@ -266,27 +269,26 @@ body.kids-page::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  padding: 12px 20px;
-  background: rgba(255,255,255,0.75);
-  border-radius: 50px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border-radius: 999px;
   margin: 0 auto 16px;
-  max-width: 460px;
-  font-size: 14px;
-  color: #666;
+  max-width: 520px;
+  font-size: 13px;
+  color: #6b7280;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  border: 1.5px solid rgba(255,255,255,0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 18px rgba(17,24,39,0.06);
+  border: 1px solid rgba(0,0,0,0.06);
   user-select: none;
   text-decoration: none;
 }
 
 .tree-stats:hover {
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 6px 20px rgba(255,107,157,0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(17,24,39,0.08);
+  transform: translateY(-1px);
 }
 
 .tree-stats:active {
@@ -321,7 +323,7 @@ body.kids-page::after {
   font-size: 56px;
   display: block;
   margin-bottom: 4px;
-  animation: bounce 2s infinite;
+  animation: none;
 }
 
 @keyframes bounce {
@@ -333,7 +335,7 @@ body.kids-page::after {
   font-size: clamp(32px, 5vw, 52px);
   font-weight: 900;
   color: var(--kids-primary);
-  text-shadow: 2px 2px 0 #ffb3d1, 4px 4px 0 rgba(255,107,157,0.15);
+  text-shadow: none;
   margin-bottom: 6px;
   line-height: 1.1;
 }
