@@ -452,8 +452,28 @@ class KidsPractice {
       u.lang = 'en-US';
       u.rate = rate;
       u.pitch = pitch;
-      // keep it short & interruptible
       window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+
+  // Queued speak: waits for current utterance to finish, then speaks
+  // If queue grows too long (fast typing), flush old entries first
+  speakQueued(text, rate=0.8, pitch=1.1) {
+    try {
+      if (!this.soundOn) return;
+      if (!('speechSynthesis' in window)) return;
+      // If pending queue > 3, clear to avoid lag
+      if (window.speechSynthesis.pending && this._speakQueueLen > 3) {
+        window.speechSynthesis.cancel();
+        this._speakQueueLen = 0;
+      }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = rate;
+      u.pitch = pitch;
+      u.onend = () => { this._speakQueueLen = Math.max(0, (this._speakQueueLen || 0) - 1); };
+      this._speakQueueLen = (this._speakQueueLen || 0) + 1;
       window.speechSynthesis.speak(u);
     } catch (_) {}
   }
@@ -566,7 +586,7 @@ class KidsPractice {
     // phonics: speak on correct hit in explore mode
     if (this.mode === 'explore' && isCorrect) {
       const say = expectedChar === ' ' ? 'space' : expectedChar;
-      this.speak(say);
+      this.speakQueued(say, 0.95, 1.15);
     }
 
     // english word read-aloud: speak completed token on space or end-of-line
@@ -579,8 +599,9 @@ class KidsPractice {
         const segment = completedBySpace ? typedNow.slice(0, -1) : typedNow;
         const tokens = segment.trim().split(/\s+/).filter(Boolean);
         const word = tokens[tokens.length - 1];
-        if (word) {
-          this.speak(word, 0.8, 1.1);
+        if (word && word.length > 1) {
+          // Queue after phonics so they don't cancel each other
+          this.speakQueued(word, 0.8, 1.1);
         }
       }
     }
