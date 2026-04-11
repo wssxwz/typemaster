@@ -193,7 +193,7 @@ function renderAnimalCards() {
 
 function startAnimal(animalId) {
   localStorage.setItem('kidsAnimalId', animalId);
-  window.location.href = 'kids-practice.html?v=1744365000';
+  window.location.href = 'kids-practice.html?v=1744365500';
 }
 
 // ============ 更新树统计 ============
