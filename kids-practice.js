@@ -448,34 +448,23 @@ class KidsPractice {
     try {
       if (!this.soundOn) return;
       if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
       u.rate = rate;
       u.pitch = pitch;
-      window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     } catch (_) {}
   }
 
-  // Queued speak: waits for current utterance to finish, then speaks
-  // If queue grows too long (fast typing), flush old entries first
-  speakQueued(text, rate=0.8, pitch=1.1) {
-    try {
-      if (!this.soundOn) return;
-      if (!('speechSynthesis' in window)) return;
-      // If pending queue > 3, clear to avoid lag
-      if (window.speechSynthesis.pending && this._speakQueueLen > 3) {
-        window.speechSynthesis.cancel();
-        this._speakQueueLen = 0;
-      }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';
-      u.rate = rate;
-      u.pitch = pitch;
-      u.onend = () => { this._speakQueueLen = Math.max(0, (this._speakQueueLen || 0) - 1); };
-      this._speakQueueLen = (this._speakQueueLen || 0) + 1;
-      window.speechSynthesis.speak(u);
-    } catch (_) {}
+  // Delayed speak: schedule after a short delay so phonics finishes first
+  // Uses cancel+speak (no queue) to avoid Chrome queue-stall bug
+  speakAfter(text, delayMs=300, rate=0.8, pitch=1.1) {
+    if (this._speakTimer) clearTimeout(this._speakTimer);
+    this._speakTimer = setTimeout(() => {
+      this.speak(text, rate, pitch);
+      this._speakTimer = null;
+    }, delayMs);
   }
 
   setupFingerGuide() {
@@ -586,7 +575,7 @@ class KidsPractice {
     // phonics: speak on correct hit in explore mode
     if (this.mode === 'explore' && isCorrect) {
       const say = expectedChar === ' ' ? 'space' : expectedChar;
-      this.speakQueued(say, 0.95, 1.15);
+      this.speak(say);
     }
 
     // english word read-aloud: speak completed token on space or end-of-line
@@ -600,8 +589,8 @@ class KidsPractice {
         const tokens = segment.trim().split(/\s+/).filter(Boolean);
         const word = tokens[tokens.length - 1];
         if (word && word.length > 1) {
-          // Queue after phonics so they don't cancel each other
-          this.speakQueued(word, 0.8, 1.1);
+          // Delayed so phonics letter finishes first, then read the word
+          this.speakAfter(word, 350, 0.8, 1.1);
         }
       }
     }
