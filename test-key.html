@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Key Test</title></head>
+<body style="padding:40px;font-family:sans-serif;">
+<h1>⌨️ 键盘测试</h1>
+<p>请按各种键，下面会显示 key 值：</p>
+<pre id="log" style="font-size:16px;background:#f5f5f5;padding:20px;border-radius:8px;max-height:400px;overflow:auto;"></pre>
+<script>
+document.addEventListener('keydown', function(e) {
+  var el = document.getElementById('log');
+  var info = 'key="' + e.key + '" code=' + e.code + ' charCode=' + e.key.charCodeAt(0) + ' shift=' + e.shiftKey + ' len=' + e.key.length;
+  el.textContent += info + '\n';
+  el.scrollTop = el.scrollHeight;
+});
+</script>
+</body>
+</html>
