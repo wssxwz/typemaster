@@ -448,23 +448,23 @@ class KidsPractice {
     try {
       if (!this.soundOn) return;
       if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
       u.rate = rate;
       u.pitch = pitch;
+      // keep it short & interruptible
+      window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     } catch (_) {}
   }
 
-  // Delayed speak: schedule after a short delay so phonics finishes first
-  // Uses cancel+speak (no queue) to avoid Chrome queue-stall bug
-  speakAfter(text, delayMs=300, rate=0.8, pitch=1.1) {
-    if (this._speakTimer) clearTimeout(this._speakTimer);
-    this._speakTimer = setTimeout(() => {
+  // Delayed speak for word read-aloud after phonics letter
+  speakWord(text, rate=0.8, pitch=1.1) {
+    if (this._wordTimer) clearTimeout(this._wordTimer);
+    this._wordTimer = setTimeout(() => {
       this.speak(text, rate, pitch);
-      this._speakTimer = null;
-    }, delayMs);
+      this._wordTimer = null;
+    }, 400);
   }
 
   setupFingerGuide() {
@@ -590,7 +590,7 @@ class KidsPractice {
         const word = tokens[tokens.length - 1];
         if (word && word.length > 1) {
           // Delayed so phonics letter finishes first, then read the word
-          this.speakAfter(word, 350, 0.8, 1.1);
+          this.speakWord(word, 0.8, 1.1);
         }
       }
     }
