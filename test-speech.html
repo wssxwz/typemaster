@@ -2,61 +2,118 @@
 <html>
 <head><meta charset="UTF-8"><title>Speech Test</title></head>
 <body style="padding:40px;font-family:sans-serif;">
-<h1>🔊 语音测试</h1>
-<button id="btn1" style="font-size:24px;padding:20px 40px;margin:10px;">
-  点我测试：说 "Hello"
+<h1>🔊 语音诊断</h1>
+
+<button id="btn1" style="font-size:24px;padding:20px 40px;margin:10px;cursor:pointer;">
+  测试1：说 "Hello World"
 </button>
 <br>
-<button id="btn2" style="font-size:24px;padding:20px 40px;margin:10px;">
-  点我测试：说 "A B C"
+<button id="btn2" style="font-size:24px;padding:20px 40px;margin:10px;cursor:pointer;">
+  测试2：逐字母 A B C D E
 </button>
 <br>
-<p id="status" style="font-size:18px;color:#666;margin-top:20px;"></p>
+<button id="btn3" style="font-size:24px;padding:20px 40px;margin:10px;cursor:pointer;">
+  测试3：模拟打字时的 speak (cancel+speak)
+</button>
+<br>
+<button id="btn4" style="font-size:24px;padding:20px 40px;margin:10px;cursor:pointer;">
+  测试4：中文语音 "你好世界"
+</button>
+
+<pre id="status" style="font-size:16px;color:#333;margin-top:20px;background:#f5f5f5;padding:20px;border-radius:8px;max-height:400px;overflow:auto;"></pre>
+
 <script>
 const status = document.getElementById('status');
-
 function log(msg) {
-  status.textContent += msg + '\n';
+  const line = new Date().toLocaleTimeString() + ' ' + msg;
+  status.textContent += line + '\n';
+  status.scrollTop = status.scrollHeight;
   console.log(msg);
 }
 
-// Check if speechSynthesis exists
-if ('speechSynthesis' in window) {
-  log('✅ speechSynthesis 可用');
-  log('voices: ' + speechSynthesis.getVoices().length);
-  speechSynthesis.onvoiceschanged = () => {
-    log('voices loaded: ' + speechSynthesis.getVoices().length);
-  };
-} else {
-  log('❌ speechSynthesis 不可用！');
+// 1. Check speechSynthesis
+log('speechSynthesis in window: ' + ('speechSynthesis' in window));
+if (!('speechSynthesis' in window)) {
+  log('❌ 浏览器不支持 speechSynthesis！');
 }
 
-document.getElementById('btn1').onclick = function() {
-  log('--- 尝试说 Hello ---');
-  const u = new SpeechSynthesisUtterance('Hello');
-  u.lang = 'en-US';
-  u.rate = 0.9;
-  u.pitch = 1.1;
-  u.onstart = () => log('🔊 开始说话');
-  u.onend = () => log('✅ 说完了');
-  u.onerror = (e) => log('❌ 错误: ' + e.error);
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+// 2. Check voices
+const voices = speechSynthesis.getVoices();
+log('初始 voices 数量: ' + voices.length);
+speechSynthesis.onvoiceschanged = () => {
+  const v = speechSynthesis.getVoices();
+  log('voices 加载完成: ' + v.length + ' 个');
+  const enVoices = v.filter(x => x.lang.startsWith('en'));
+  log('英文 voices: ' + enVoices.length + ' 个');
+  if (enVoices.length > 0) {
+    log('第一个英文 voice: ' + enVoices[0].name + ' (' + enVoices[0].lang + ')');
+  }
 };
 
-document.getElementById('btn2').onclick = function() {
-  log('--- 尝试说 A B C ---');
-  ['A', 'B', 'C'].forEach((letter, i) => {
-    setTimeout(() => {
-      const u = new SpeechSynthesisUtterance(letter);
-      u.lang = 'en-US';
-      u.onstart = () => log('🔊 说: ' + letter);
-      u.onend = () => log('✅ 完成: ' + letter);
-      u.onerror = (e) => log('❌ 错误: ' + e.error);
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }, i * 500);
+// 3. Check if paused/speaking
+log('speechSynthesis.paused: ' + speechSynthesis.paused);
+log('speechSynthesis.speaking: ' + speechSynthesis.speaking);
+log('speechSynthesis.pending: ' + speechSynthesis.pending);
+
+function doSpeak(text, lang) {
+  return new Promise((resolve) => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || 'en-US';
+    u.rate = 0.9;
+    u.pitch = 1.1;
+    u.onstart = () => log('  🔊 onstart: "' + text + '"');
+    u.onend = () => { log('  ✅ onend: "' + text + '"'); resolve('ok'); };
+    u.onerror = (e) => { log('  ❌ onerror: "' + text + '" error=' + e.error); resolve('error'); };
+    u.onpause = () => log('  ⏸ onpause: "' + text + '"');
+    u.onresume = () => log('  ▶ onresume: "' + text + '"');
+    log('  → calling cancel()...');
+    speechSynthesis.cancel();
+    log('  → calling speak("' + text + '")...');
+    log('  → state: paused=' + speechSynthesis.paused + ' speaking=' + speechSynthesis.speaking);
+    speechSynthesis.speak(u);
+    log('  → after speak(): paused=' + speechSynthesis.paused + ' speaking=' + speechSynthesis.speaking);
+    // Timeout fallback
+    setTimeout(() => resolve('timeout'), 5000);
   });
+}
+
+// Test 1: Simple speak
+document.getElementById('btn1').onclick = async function() {
+  log('\n=== 测试1: 说 Hello World ===');
+  await doSpeak('Hello World', 'en-US');
+  log('=== 测试1 结束 ===');
+};
+
+// Test 2: Sequential letters
+document.getElementById('btn2').onclick = async function() {
+  log('\n=== 测试2: 逐字母 A B C D E ===');
+  for (const ch of ['A', 'B', 'C', 'D', 'E']) {
+    await doSpeak(ch, 'en-US');
+  }
+  log('=== 测试2 结束 ===');
+};
+
+// Test 3: Cancel+speak rapid (simulating typing)
+document.getElementById('btn3').onclick = async function() {
+  log('\n=== 测试3: 模拟快速打字 cancel+speak ===');
+  for (const ch of ['H', 'e', 'l', 'l', 'o']) {
+    const u = new SpeechSynthesisUtterance(ch);
+    u.lang = 'en-US';
+    u.rate = 0.95;
+    u.pitch = 1.15;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+    log('  spoke: ' + ch);
+    await new Promise(r => setTimeout(r, 150));
+  }
+  log('=== 测试3 结束 ===');
+};
+
+// Test 4: Chinese
+document.getElementById('btn4').onclick = async function() {
+  log('\n=== 测试4: 中文 "你好世界" ===');
+  await doSpeak('你好世界', 'zh-CN');
+  log('=== 测试4 结束 ===');
 };
 </script>
 </body>
