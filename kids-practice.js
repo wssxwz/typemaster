@@ -488,6 +488,31 @@ class KidsPractice {
     }, 400);
   }
 
+  // Speak a full sentence by chaining word audio sequentially
+  speakSentence(sentence) {
+    if (!this.soundOn) return;
+    const words = sentence.toLowerCase().replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return;
+    let i = 0;
+    const playNext = () => {
+      if (i >= words.length) return;
+      const word = words[i++];
+      let url;
+      if (word.length === 1 && word >= 'a' && word <= 'z') {
+        url = `audio/letters/${word}.mp3`;
+      } else {
+        url = `audio/words/${word}.mp3`;
+      }
+      const audio = new Audio(url);
+      audio.volume = 0.8;
+      audio.onended = () => setTimeout(playNext, 80);
+      audio.onerror = () => setTimeout(playNext, 50);
+      audio.play().catch(() => setTimeout(playNext, 50));
+    };
+    // Small delay before starting sentence
+    setTimeout(playNext, 300);
+  }
+
   setupFingerGuide() {
     const wrap = document.getElementById('kidsFingerGuide');
     if (!wrap) return;
@@ -669,10 +694,10 @@ class KidsPractice {
     const lineText = this.lines[idx];
     this.addToLog(idx, lineText);
 
-    // Speak full word/line after completion (explore mode)
+    // Speak full sentence after completion (explore mode)
     if (this.mode === 'explore') {
       const phrase = (lineText || '').trim();
-      if (phrase) this.speak(phrase, 0.9, 1.05);
+      if (phrase) this.speakSentence(phrase);
     }
 
     // Update progress badge
