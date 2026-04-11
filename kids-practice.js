@@ -1,3 +1,10 @@
+const SYMBOL_MAP = {
+  "+": "plus", "-": "minus", "*": "times", "/": "divided",
+  "=": "equals", "(": "openparen", ")": "closeparen",
+  "!": "exclamation", "?": "question", ".": "period",
+  ",": "comma", "'": "apostrophe"
+};
+
 // TypeKids - 幼儿版练习逻辑 v2
 // 设计：统一区域 = 动物图片 + 打字条带叠加
 // 每打完一行，该行遮罩消失，图片逐渐显露
@@ -447,13 +454,7 @@ class KidsPractice {
     input.setSelectionRange(0, 0);
   }
 
-  // Symbol to audio filename mapping
-  static SYMBOL_MAP = {
-    '+': 'plus', '-': 'minus', '*': 'times', '/': 'divided',
-    '=': 'equals', '(': 'openparen', ')': 'closeparen',
-    '!': 'exclamation', '?': 'question', '.': 'period',
-    ',': 'comma', "'": 'apostrophe'
-  };
+
 
   speak(text, rate=0.95, pitch=1.15) {
     try {
@@ -466,8 +467,8 @@ class KidsPractice {
       let url;
       if (word.length === 1 && word >= 'a' && word <= 'z') {
         url = `audio/letters/${word}.mp3`;
-      } else if (KidsPractice.SYMBOL_MAP[text]) {
-        url = `audio/words/${KidsPractice.SYMBOL_MAP[text]}.mp3`;
+      } else if (SYMBOL_MAP[text]) {
+        url = `audio/words/${SYMBOL_MAP[text]}.mp3`;
       } else {
         url = `audio/words/${word}.mp3`;
       }
@@ -515,8 +516,8 @@ class KidsPractice {
       let url;
       if (word.length === 1 && word >= 'a' && word <= 'z') {
         url = `audio/letters/${word}.mp3`;
-      } else if (KidsPractice.SYMBOL_MAP[token]) {
-        url = `audio/words/${KidsPractice.SYMBOL_MAP[token]}.mp3`;
+      } else if (SYMBOL_MAP[token]) {
+        url = `audio/words/${SYMBOL_MAP[token]}.mp3`;
       } else {
         // Strip punctuation for word lookup
         const clean = word.replace(/[^a-z0-9]/g, '');
@@ -597,18 +598,18 @@ class KidsPractice {
     });
   }
 
-  // Convert fullwidth characters to halfwidth (e.g. Chinese IME outputs)
-  static FULLWIDTH_MAP = {
-    '\uff08':'(', '\uff09':')', '\uff01':'!', '\uff1f':'?',
-    '\uff0b':'+', '\uff0d':'-', '\uff0a':'*', '\uff0f':'/',
-    '\uff1d':'=', '\uff0c':',', '\uff0e':'.', '\uff1a':':',
-    '\uff1b':';', '\u3001':',', '\u3002':'.', '\u201c':'"', '\u201d':'"',
-    '\u2018':"'", '\u2019':"'",
-  };
-
   handleChar(ch) {
-    // Normalize fullwidth → halfwidth
-    ch = KidsPractice.FULLWIDTH_MAP[ch] || ch;
+    // Normalize fullwidth → halfwidth (Chinese IME outputs fullwidth symbols)
+    const cc = ch.charCodeAt(0);
+    // Fullwidth ASCII range: 0xFF01-0xFF5E maps to 0x21-0x7E
+    if (cc >= 0xFF01 && cc <= 0xFF5E) {
+      ch = String.fromCharCode(cc - 0xFEE0);
+    }
+    // CJK punctuation
+    if (ch === '\u3001') ch = ',';
+    if (ch === '\u3002') ch = '.';
+    if (ch === '\u201C' || ch === '\u201D') ch = '"';
+    if (ch === '\u2018' || ch === '\u2019') ch = "'";
 
     if (this.currentLineIndex >= this.lines.length) return;
     const target = this.lines[this.currentLineIndex];
