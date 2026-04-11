@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Speech Test</title></head>
+<body style="padding:40px;font-family:sans-serif;">
+<h1>🔊 语音测试</h1>
+<button id="btn1" style="font-size:24px;padding:20px 40px;margin:10px;">
+  点我测试：说 "Hello"
+</button>
+<br>
+<button id="btn2" style="font-size:24px;padding:20px 40px;margin:10px;">
+  点我测试：说 "A B C"
+</button>
+<br>
+<p id="status" style="font-size:18px;color:#666;margin-top:20px;"></p>
+<script>
+const status = document.getElementById('status');
+
+function log(msg) {
+  status.textContent += msg + '\n';
+  console.log(msg);
+}
+
+// Check if speechSynthesis exists
+if ('speechSynthesis' in window) {
+  log('✅ speechSynthesis 可用');
+  log('voices: ' + speechSynthesis.getVoices().length);
+  speechSynthesis.onvoiceschanged = () => {
+    log('voices loaded: ' + speechSynthesis.getVoices().length);
+  };
+} else {
+  log('❌ speechSynthesis 不可用！');
+}
+
+document.getElementById('btn1').onclick = function() {
+  log('--- 尝试说 Hello ---');
+  const u = new SpeechSynthesisUtterance('Hello');
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  u.pitch = 1.1;
+  u.onstart = () => log('🔊 开始说话');
+  u.onend = () => log('✅ 说完了');
+  u.onerror = (e) => log('❌ 错误: ' + e.error);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+};
+
+document.getElementById('btn2').onclick = function() {
+  log('--- 尝试说 A B C ---');
+  ['A', 'B', 'C'].forEach((letter, i) => {
+    setTimeout(() => {
+      const u = new SpeechSynthesisUtterance(letter);
+      u.lang = 'en-US';
+      u.onstart = () => log('🔊 说: ' + letter);
+      u.onend = () => log('✅ 完成: ' + letter);
+      u.onerror = (e) => log('❌ 错误: ' + e.error);
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }, i * 500);
+  });
+};
+</script>
+</body>
+</html>
