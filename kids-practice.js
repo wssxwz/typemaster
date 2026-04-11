@@ -374,7 +374,18 @@ class KidsPractice {
     const card = document.getElementById('unifiedCard');
 
     // Click card → focus (avoid global click stealing focus)
-    card.addEventListener('click', () => this.focusInput());
+    // Also "warm up" speechSynthesis on first click (Safari requires
+    // a user-gesture click/touch to unlock the speech engine;
+    // keydown alone is not enough).
+    card.addEventListener('click', () => {
+      this.focusInput();
+      if (!this._speechUnlocked && 'speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance('');
+        u.volume = 0;
+        speechSynthesis.speak(u);
+        this._speechUnlocked = true;
+      }
+    });
 
     /* Desktop keyboard: keydown */
     document.addEventListener('keydown', (e) => {
