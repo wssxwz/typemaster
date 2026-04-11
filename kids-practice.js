@@ -451,18 +451,31 @@ class KidsPractice {
     try {
       if (!this.soundOn) return;
       if (!text || text === ' ') return;
-      // Use Google Translate TTS (works everywhere, no browser TTS dependency)
-      const encoded = encodeURIComponent(text.toLowerCase());
-      const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encoded}&tl=en&client=gtx`;
+      const word = text.toLowerCase().trim();
+      if (!word) return;
+
+      // Build audio URL: local files for letters and known words
+      let url;
+      if (word.length === 1 && word >= 'a' && word <= 'z') {
+        url = `audio/letters/${word}.mp3`;
+      } else {
+        url = `audio/words/${word}.mp3`;
+      }
+
       if (this._currentAudio) {
         this._currentAudio.pause();
         this._currentAudio = null;
       }
       const audio = new Audio(url);
       audio.volume = 0.8;
-      audio.playbackRate = rate;
       this._currentAudio = audio;
-      audio.play().catch(() => {});
+      audio.play().catch(() => {
+        // Fallback: try Google Dictionary for unknown words
+        const fallback = new Audio(`https://ssl.gstatic.com/dictionary/static/sounds/20200429/${word}--_gb_1.mp3`);
+        fallback.volume = 0.8;
+        this._currentAudio = fallback;
+        fallback.play().catch(() => {});
+      });
     } catch (_) {}
   }
 
