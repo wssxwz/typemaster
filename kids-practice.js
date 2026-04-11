@@ -716,7 +716,7 @@ class KidsPractice {
       if (phrase) {
         // Only read full sentence, 1.5s after last letter phonics
         // (no separate last-word read to avoid hearing it twice)
-        this.speakSentence(phrase, 1500);
+        this.speakSentence(phrase, 1000);
       }
     }
 
