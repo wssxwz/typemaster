@@ -569,6 +569,22 @@ class KidsPractice {
       this.speak(say);
     }
 
+    // english word read-aloud: speak completed token on space or end-of-line
+    if (this.animal?.language === 'english' && isCorrect) {
+      const typedNow = this.userInput;
+      const completedBySpace = expectedChar === ' ';
+      const completedByLineEnd = typedNow.length === target.length;
+
+      if (completedBySpace || completedByLineEnd) {
+        const segment = completedBySpace ? typedNow.slice(0, -1) : typedNow;
+        const tokens = segment.trim().split(/\s+/).filter(Boolean);
+        const word = tokens[tokens.length - 1];
+        if (word) {
+          this.speak(word, 0.8, 1.1);
+        }
+      }
+    }
+
     this.updateStats();
 
     // Check line completion

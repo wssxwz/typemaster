@@ -23,7 +23,81 @@ const kidsAnimals = [
     svg: makeAnimalSVG('panda')
   },
   {
-    id: 'fox',
+    id: 'otter_letters_lower',
+    emoji: '🦦',
+    name: '小水獭',
+    nameEn: 'Otter',
+    language: 'english',
+    color: '#d1f2eb',
+    stars: 1,
+    description: '小写字母分组练习',
+    descriptionEn: 'Lowercase letter groups',
+    lines: [
+      'a b c d e',
+      'f g h i j',
+      'k l m n o',
+      'p q r s t',
+      'u v w x y z'
+    ],
+    svg: makeAnimalSVG('otter')
+  },
+  {
+    id: 'seal_letters_upper',
+    emoji: '🦭',
+    name: '小海豹',
+    nameEn: 'Seal',
+    language: 'english',
+    color: '#d6eaf8',
+    stars: 1,
+    description: '大写字母分组练习',
+    descriptionEn: 'Uppercase letter groups',
+    lines: [
+      'A B C D E',
+      'F G H I J',
+      'K L M N O',
+      'P Q R S T',
+      'U V W X Y Z'
+    ],
+    svg: makeAnimalSVG('seal')
+  },
+  {
+    id: 'rabbit',
+    emoji: '🐰',
+    name: '小兔子',
+    nameEn: 'Rabbit',
+    language: 'english',
+    color: '#f3e5f5',
+    stars: 1,
+    description: '超短英文单词',
+    descriptionEn: 'Short words',
+    lines: [
+      'cat dog pig cow',
+      'sun moon star sky',
+      'red blue green pink',
+      'one two three four',
+      'I can read now!'
+    ],
+    svg: makeAnimalSVG('rabbit')
+  },
+  {
+    id: 'chick_words_basic',
+    emoji: '🐥',
+    name: '小鸡',
+    nameEn: 'Chick',
+    language: 'english',
+    color: '#fff5ba',
+    stars: 1,
+    description: '三字母日常单词',
+    descriptionEn: 'Easy 3-letter daily words',
+    lines: [
+      'cat dog sun hat',
+      'pen cup bus map',
+      'red bed box toy',
+      'jam egg pig fox',
+      'run hop sit nap'
+    ],
+    svg: makeAnimalSVG('chick')
+  },
     emoji: '🦊',
     name: '小狐狸',
     nameEn: 'Fox',
@@ -154,6 +228,82 @@ const kidsAnimals = [
     ],
     svg: makeAnimalSVG('koala')
   },
+  {
+    id: 'alpaca_letters_pair',
+    emoji: '🦙',
+    name: '羊驼',
+    nameEn: 'Alpaca',
+    language: 'english',
+    color: '#fbeee6',
+    stars: 2,
+    description: '大小写字母配对练习',
+    descriptionEn: 'Upper and lowercase matching',
+    lines: [
+      'Aa Bb Cc Dd Ee',
+      'Ff Gg Hh Ii Jj',
+      'Kk Ll Mm Nn Oo',
+      'Pp Qq Rr Ss Tt',
+      'Uu Vv Ww Xx Yy Zz'
+    ],
+    svg: makeAnimalSVG('alpaca')
+  },
+  {
+    id: 'hedgehog_letters_mix',
+    emoji: '🦔',
+    name: '小刺猬',
+    nameEn: 'Hedgehog',
+    language: 'english',
+    color: '#e8d8c3',
+    stars: 2,
+    description: '随机大小写字母混合',
+    descriptionEn: 'Mixed random uppercase and lowercase letters',
+    lines: [
+      'A b C d E f G h',
+      'i J k L m N o P',
+      'Q r S t U v W x',
+      'y Z a B c D e F',
+      'g H i J k L m N'
+    ],
+    svg: makeAnimalSVG('hedgehog')
+  },
+  {
+    id: 'squirrel_words_title',
+    emoji: '🐿️',
+    name: '小松鼠',
+    nameEn: 'Squirrel',
+    language: 'english',
+    color: '#f6d8b8',
+    stars: 2,
+    description: '日常物品首字母大写',
+    descriptionEn: 'Daily objects with capital initials',
+    lines: [
+      'Apple Banana Water Bread',
+      'Pencil Eraser Bottle Spoon',
+      'Window Table Pillow Basket',
+      'School Garden Market Library',
+      'Morning Dinner Weekend Holiday'
+    ],
+    svg: makeAnimalSVG('squirrel')
+  },
+  {
+    id: 'duck_words_mix',
+    emoji: '🦆',
+    name: '小鸭子',
+    nameEn: 'Duck',
+    language: 'english',
+    color: '#d9ecff',
+    stars: 2,
+    description: '动物颜色数字混合单词',
+    descriptionEn: 'Mixed animal, color and number words',
+    lines: [
+      'Red cat Two dogs',
+      'Blue bird Three fish',
+      'Green frog Four ducks',
+      'Yellow bee Five ants',
+      'Pink pig One rabbit'
+    ],
+    svg: makeAnimalSVG('duck')
+  },
 
   // ==================== 难度⭐⭐⭐ - 挑战级 ====================
   {
@@ -229,6 +379,25 @@ const kidsAnimals = [
       'My frog is my friend!'
     ],
     svg: makeAnimalSVG('frog')
+  },
+  {
+    id: 'sloth_words_long',
+    emoji: '🦥',
+    name: '树懒',
+    nameEn: 'Sloth',
+    language: 'english',
+    color: '#d7ccc8',
+    stars: 3,
+    description: '稍长日常单词和短语',
+    descriptionEn: 'Longer daily words and short phrases',
+    lines: [
+      'playground butterfly beautiful',
+      'good morning happy birthday',
+      'rainbow sunshine little garden',
+      'reading together after school',
+      'thank you my best friend'
+    ],
+    svg: makeAnimalSVG('sloth')
   },
 
   // ==================== 难度⭐⭐⭐⭐ - 专家级 ====================
