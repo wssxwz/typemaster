@@ -469,13 +469,7 @@ class KidsPractice {
       const audio = new Audio(url);
       audio.volume = 0.8;
       this._currentAudio = audio;
-      audio.play().catch(() => {
-        // Fallback: try Google Dictionary for unknown words
-        const fallback = new Audio(`https://ssl.gstatic.com/dictionary/static/sounds/20200429/${word}--_gb_1.mp3`);
-        fallback.volume = 0.8;
-        this._currentAudio = fallback;
-        fallback.play().catch(() => {});
-      });
+      audio.play().catch(() => {});
     } catch (_) {}
   }
 
@@ -618,10 +612,9 @@ class KidsPractice {
       setTimeout(() => el.classList.remove('hit-correct', 'hit-wrong'), 240);
     }
 
-    // phonics: speak on correct hit in explore mode
-    if (this.mode === 'explore' && isCorrect) {
-      const say = expectedChar === ' ' ? 'space' : expectedChar;
-      this.speak(say);
+    // phonics: speak on correct hit in explore mode (skip space)
+    if (this.mode === 'explore' && isCorrect && expectedChar !== ' ') {
+      this.speak(expectedChar);
     }
 
     // english word read-aloud: speak completed token on space or end-of-line
