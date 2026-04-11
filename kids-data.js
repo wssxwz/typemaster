@@ -98,6 +98,8 @@ const kidsAnimals = [
     ],
     svg: makeAnimalSVG('chick')
   },
+  {
+    id: 'fox',
     emoji: '🦊',
     name: '小狐狸',
     nameEn: 'Fox',
@@ -113,25 +115,6 @@ const kidsAnimals = [
       'z c s y w ai'
     ],
     svg: makeAnimalSVG('fox')
-  },
-  {
-    id: 'rabbit',
-    emoji: '🐰',
-    name: '小兔子',
-    nameEn: 'Rabbit',
-    language: 'english',
-    color: '#f3e5f5',
-    stars: 1,
-    description: '超短英文单词',
-    descriptionEn: 'Short words',
-    lines: [
-      'cat dog pig cow',
-      'sun moon star sky',
-      'red blue green pink',
-      'one two three four',
-      'I can read now!'
-    ],
-    svg: makeAnimalSVG('rabbit')
   },
   {
     id: 'bear',
