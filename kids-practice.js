@@ -377,20 +377,7 @@ class KidsPractice {
     // Also "warm up" speechSynthesis on first click (Safari requires
     // a user-gesture click/touch to unlock the speech engine;
     // keydown alone is not enough).
-    card.addEventListener('click', () => {
-      this.focusInput();
-      if (!this._speechUnlocked && 'speechSynthesis' in window) {
-        // Safari needs an audible speak() from a click to unlock the engine
-        const u = new SpeechSynthesisUtterance('ready');
-        u.lang = 'en-US';
-        u.rate = 1;
-        u.pitch = 1;
-        u.volume = 0.3;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(u);
-        this._speechUnlocked = true;
-      }
-    });
+    card.addEventListener('click', () => this.focusInput());
 
     /* Desktop keyboard: keydown */
     document.addEventListener('keydown', (e) => {
@@ -462,33 +449,21 @@ class KidsPractice {
 
   speak(text, rate=0.95, pitch=1.15) {
     try {
-      if (!this.soundOn) { this._dbg('speak SKIP: soundOn=false'); return; }
-      if (!('speechSynthesis' in window)) { this._dbg('speak SKIP: no speechSynthesis'); return; }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';
-      u.rate = rate;
-      u.pitch = pitch;
-      u.onstart = () => this._dbg('🔊 started: ' + text);
-      u.onend = () => this._dbg('✅ ended: ' + text);
-      u.onerror = (ev) => this._dbg('❌ error: ' + text + ' ' + ev.error);
-      // keep it short & interruptible
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-      this._dbg('speak("' + text + '") called, paused=' + speechSynthesis.paused + ' speaking=' + speechSynthesis.speaking);
-    } catch (e) { this._dbg('speak EXCEPTION: ' + e.message); }
-  }
-
-  // Debug panel on page
-  _dbg(msg) {
-    let el = document.getElementById('_speechDebug');
-    if (!el) {
-      el = document.createElement('pre');
-      el.id = '_speechDebug';
-      el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:150px;overflow:auto;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;padding:8px;margin:0;z-index:99999;';
-      document.body.appendChild(el);
-    }
-    el.textContent += new Date().toLocaleTimeString() + ' ' + msg + '\n';
-    el.scrollTop = el.scrollHeight;
+      if (!this.soundOn) return;
+      if (!text || text === ' ') return;
+      // Use Google Translate TTS (works everywhere, no browser TTS dependency)
+      const encoded = encodeURIComponent(text.toLowerCase());
+      const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encoded}&tl=en&client=gtx`;
+      if (this._currentAudio) {
+        this._currentAudio.pause();
+        this._currentAudio = null;
+      }
+      const audio = new Audio(url);
+      audio.volume = 0.8;
+      audio.playbackRate = rate;
+      this._currentAudio = audio;
+      audio.play().catch(() => {});
+    } catch (_) {}
   }
 
   // Delayed speak for word read-aloud after phonics letter
