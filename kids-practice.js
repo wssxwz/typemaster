@@ -454,7 +454,7 @@ class KidsPractice {
       const word = text.toLowerCase().trim();
       if (!word) return;
 
-      // Build audio URL: local files for letters and known words
+      // Build audio URL: local files for letters, numbers, and words
       let url;
       if (word.length === 1 && word >= 'a' && word <= 'z') {
         url = `audio/letters/${word}.mp3`;
@@ -483,9 +483,10 @@ class KidsPractice {
   }
 
   // Speak a full sentence by chaining word audio sequentially
-  speakSentence(sentence) {
+  speakSentence(sentence, delayMs) {
     if (!this.soundOn) return;
-    const words = sentence.toLowerCase().replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+    const startDelay = delayMs || 1200;
+    const words = sentence.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
     if (!words.length) return;
     let i = 0;
     const playNext = () => {
@@ -503,8 +504,7 @@ class KidsPractice {
       audio.onerror = () => setTimeout(playNext, 100);
       audio.play().catch(() => setTimeout(playNext, 100));
     };
-    // Wait 1.2s after last word finishes before reading full sentence
-    setTimeout(playNext, 1200);
+    setTimeout(playNext, startDelay);
   }
 
   setupFingerGuide() {
@@ -612,25 +612,22 @@ class KidsPractice {
       setTimeout(() => el.classList.remove('hit-correct', 'hit-wrong'), 240);
     }
 
-    // phonics: speak on correct hit in explore mode (skip space)
+    // phonics: speak on correct hit in explore mode (skip space and symbols)
     if (this.mode === 'explore' && isCorrect && expectedChar !== ' ') {
-      this.speak(expectedChar);
+      const isLetter = expectedChar >= 'a' && expectedChar <= 'z' || expectedChar >= 'A' && expectedChar <= 'Z';
+      const isDigit = expectedChar >= '0' && expectedChar <= '9';
+      if (isLetter || isDigit) {
+        this.speak(expectedChar);
+      }
     }
 
-    // english word read-aloud: speak completed token on space or end-of-line
-    if (this.animal?.language === 'english' && isCorrect) {
-      const typedNow = this.userInput;
-      const completedBySpace = expectedChar === ' ';
-      const completedByLineEnd = typedNow.length === target.length;
-
-      if (completedBySpace || completedByLineEnd) {
-        const segment = completedBySpace ? typedNow.slice(0, -1) : typedNow;
-        const tokens = segment.trim().split(/\s+/).filter(Boolean);
-        const word = tokens[tokens.length - 1];
-        if (word && word.length > 1) {
-          // Delayed so phonics letter finishes first, then read the word
-          this.speakWord(word, 0.8, 1.1);
-        }
+    // english word read-aloud: speak completed token on space (NOT on line end — line end handled by speakSentence)
+    if (this.animal?.language === 'english' && isCorrect && expectedChar === ' ') {
+      const segment = this.userInput.slice(0, -1);
+      const tokens = segment.trim().split(/\s+/).filter(Boolean);
+      const word = tokens[tokens.length - 1];
+      if (word && word.length > 1) {
+        this.speakWord(word, 0.8, 1.1);
       }
     }
 
@@ -687,10 +684,16 @@ class KidsPractice {
     const lineText = this.lines[idx];
     this.addToLog(idx, lineText);
 
-    // Speak full sentence after completion (explore mode)
+    // Speak: last word first, then full sentence after 1s gap
     if (this.mode === 'explore') {
       const phrase = (lineText || '').trim();
-      if (phrase) this.speakSentence(phrase);
+      if (phrase) {
+        // Read last word immediately (after phonics letter)
+        const lastWord = phrase.split(/\s+/).filter(Boolean).pop();
+        if (lastWord) this.speakWord(lastWord, 0.8, 1.1);
+        // Then read full sentence after last word finishes (~1.5s)
+        this.speakSentence(phrase, 1500);
+      }
     }
 
     // Update progress badge
