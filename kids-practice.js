@@ -499,12 +499,12 @@ class KidsPractice {
       }
       const audio = new Audio(url);
       audio.volume = 0.8;
-      audio.onended = () => setTimeout(playNext, 80);
-      audio.onerror = () => setTimeout(playNext, 50);
-      audio.play().catch(() => setTimeout(playNext, 50));
+      audio.onended = () => setTimeout(playNext, 200);
+      audio.onerror = () => setTimeout(playNext, 100);
+      audio.play().catch(() => setTimeout(playNext, 100));
     };
-    // Small delay before starting sentence
-    setTimeout(playNext, 300);
+    // Wait 1.2s after last word finishes before reading full sentence
+    setTimeout(playNext, 1200);
   }
 
   setupFingerGuide() {
