@@ -597,7 +597,19 @@ class KidsPractice {
     });
   }
 
+  // Convert fullwidth characters to halfwidth (e.g. Chinese IME outputs)
+  static FULLWIDTH_MAP = {
+    '\uff08':'(', '\uff09':')', '\uff01':'!', '\uff1f':'?',
+    '\uff0b':'+', '\uff0d':'-', '\uff0a':'*', '\uff0f':'/',
+    '\uff1d':'=', '\uff0c':',', '\uff0e':'.', '\uff1a':':',
+    '\uff1b':';', '\u3001':',', '\u3002':'.', '\u201c':'"', '\u201d':'"',
+    '\u2018':"'", '\u2019':"'",
+  };
+
   handleChar(ch) {
+    // Normalize fullwidth → halfwidth
+    ch = KidsPractice.FULLWIDTH_MAP[ch] || ch;
+
     if (this.currentLineIndex >= this.lines.length) return;
     const target = this.lines[this.currentLineIndex];
     if (this.userInput.length >= target.length) return;
