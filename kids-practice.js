@@ -447,6 +447,14 @@ class KidsPractice {
     input.setSelectionRange(0, 0);
   }
 
+  // Symbol to audio filename mapping
+  static SYMBOL_MAP = {
+    '+': 'plus', '-': 'minus', '*': 'times', '/': 'divided',
+    '=': 'equals', '(': 'openparen', ')': 'closeparen',
+    '!': 'exclamation', '?': 'question', '.': 'period',
+    ',': 'comma', "'": 'apostrophe'
+  };
+
   speak(text, rate=0.95, pitch=1.15) {
     try {
       if (!this.soundOn) return;
@@ -454,10 +462,12 @@ class KidsPractice {
       const word = text.toLowerCase().trim();
       if (!word) return;
 
-      // Build audio URL: local files for letters, numbers, and words
+      // Build audio URL
       let url;
       if (word.length === 1 && word >= 'a' && word <= 'z') {
         url = `audio/letters/${word}.mp3`;
+      } else if (KidsPractice.SYMBOL_MAP[text]) {
+        url = `audio/words/${KidsPractice.SYMBOL_MAP[text]}.mp3`;
       } else {
         url = `audio/words/${word}.mp3`;
       }
@@ -469,6 +479,15 @@ class KidsPractice {
       const audio = new Audio(url);
       audio.volume = 0.8;
       this._currentAudio = audio;
+      audio.play().catch(() => {});
+    } catch (_) {}
+  }
+
+  // Play error sound on wrong keystroke
+  playError() {
+    try {
+      const audio = new Audio('audio/error.mp3');
+      audio.volume = 0.5;
       audio.play().catch(() => {});
     } catch (_) {}
   }
@@ -486,18 +505,24 @@ class KidsPractice {
   speakSentence(sentence, delayMs) {
     if (!this.soundOn) return;
     const startDelay = delayMs || 1200;
-    const words = sentence.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
-    if (!words.length) return;
+    const tokens = sentence.trim().split(/\s+/).filter(Boolean);
+    if (!tokens.length) return;
     let i = 0;
     const playNext = () => {
-      if (i >= words.length) return;
-      const word = words[i++];
+      if (i >= tokens.length) return;
+      const token = tokens[i++];
+      const word = token.toLowerCase();
       let url;
       if (word.length === 1 && word >= 'a' && word <= 'z') {
         url = `audio/letters/${word}.mp3`;
+      } else if (KidsPractice.SYMBOL_MAP[token]) {
+        url = `audio/words/${KidsPractice.SYMBOL_MAP[token]}.mp3`;
       } else {
-        url = `audio/words/${word}.mp3`;
+        // Strip punctuation for word lookup
+        const clean = word.replace(/[^a-z0-9]/g, '');
+        url = clean ? `audio/words/${clean}.mp3` : null;
       }
+      if (!url) { setTimeout(playNext, 50); return; }
       const audio = new Audio(url);
       audio.volume = 0.8;
       audio.onended = () => setTimeout(playNext, 200);
@@ -612,13 +637,14 @@ class KidsPractice {
       setTimeout(() => el.classList.remove('hit-correct', 'hit-wrong'), 240);
     }
 
-    // phonics: speak on correct hit in explore mode (skip space and symbols)
+    // phonics: speak on correct hit in explore mode (skip space only)
     if (this.mode === 'explore' && isCorrect && expectedChar !== ' ') {
-      const isLetter = expectedChar >= 'a' && expectedChar <= 'z' || expectedChar >= 'A' && expectedChar <= 'Z';
-      const isDigit = expectedChar >= '0' && expectedChar <= '9';
-      if (isLetter || isDigit) {
-        this.speak(expectedChar);
-      }
+      this.speak(expectedChar);
+    }
+
+    // error sound on wrong key
+    if (!isCorrect && this.soundOn) {
+      this.playError();
     }
 
     // english word read-aloud: speak completed token on space (NOT on line end — line end handled by speakSentence)
