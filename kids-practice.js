@@ -714,10 +714,7 @@ class KidsPractice {
     if (this.mode === 'explore') {
       const phrase = (lineText || '').trim();
       if (phrase) {
-        // Read last word immediately (after phonics letter)
-        const lastWord = phrase.split(/\s+/).filter(Boolean).pop();
-        if (lastWord) this.speakWord(lastWord, 0.8, 1.1);
-        // Then read full sentence after last word finishes (~1.5s)
+        // Wait 1.5s after last letter phonics, then read full sentence
         this.speakSentence(phrase, 1500);
       }
     }
