@@ -380,8 +380,13 @@ class KidsPractice {
     card.addEventListener('click', () => {
       this.focusInput();
       if (!this._speechUnlocked && 'speechSynthesis' in window) {
-        const u = new SpeechSynthesisUtterance('');
-        u.volume = 0;
+        // Safari needs an audible speak() from a click to unlock the engine
+        const u = new SpeechSynthesisUtterance('ready');
+        u.lang = 'en-US';
+        u.rate = 1;
+        u.pitch = 1;
+        u.volume = 0.3;
+        speechSynthesis.cancel();
         speechSynthesis.speak(u);
         this._speechUnlocked = true;
       }
